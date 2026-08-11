@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POLYCARE – Run Diagnosis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    :root {
+      --pink-50:  #fff0f5;
+      --pink-100: #ffe0ec;
+      --pink-200: #ffc2d9;
+      --pink-300: #ff96bc;
+      --pink-400: #ff5e98;
+      --pink-500: #f72d6e;
+      --pink-600: #d91559;
+      --pink-700: #b00f47;
+      --pink-800: #8a0d38;
+      --pink-900: #5c0924;
+
+      --rose:     #f72d6e;
+      --rose-soft:#ff7aaa;
+      --rose-dim: rgba(247,45,110,0.12);
+
+      --bg-deep:  #2e1638;
+      --bg-card:  #130917;
+      --bg-card2: #180d1f;
+      --bg-glass: rgba(255,255,255,0.04);
+
+      --text-primary:   #f5eef8;
+      --text-secondary: #c9aed8;
+      --text-muted:     #7e6490;
+
+      --border:      rgba(247,45,110,0.18);
+      --border-soft: rgba(255,255,255,0.07);
+
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+      --font-display: 'Playfair Display', serif;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-xl: 32px;
+
+      --shadow-card: 0 4px 32px rgba(247,45,110,0.10), 0 1px 4px rgba(0,0,0,0.4);
+      --shadow-glow: 0 0 60px rgba(247,45,110,0.25);
+
+      --primary:       #f72d6e;
+      --primary-dark:  #d91559;
+      --primary-light: #ff7aaa;
+      --secondary:     #8b5cf6;
+      --success:       #00d4aa;
+      --error:         #ff5f7e;
+      --warning:       #f59e0b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: radial-gradient(circle at top left, rgba(247,45,110,0.12), transparent 40%),
+                  radial-gradient(circle at bottom right, rgba(180,40,240,0.10), transparent 40%),
+                  var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      padding: 0 36px;
+      background: rgba(13,6,16,0.82);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      border-bottom: 1px solid var(--border-soft);
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+      color: var(--text-primary);
+      -webkit-text-fill-color: unset;
+      background: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo-img {
+      height: 36px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .nav-link {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s, background 0.2s;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(255,255,255,0.05);
+    }
+
+    #server-status {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-teal {
+      background: rgba(20,210,160,0.12);
+      color: #14d2a0;
+      border: 1px solid rgba(20,210,160,0.25);
+    }
+
+    .dark-toggle {
+      background: none;
+      border: 1px solid var(--border-soft);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
+      margin-left: 4px;
+    }
+
+    .dark-toggle:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .predict-page {
+      min-height: 100vh;
+      padding-top: calc(var(--nav-h) + 40px);
+      padding-bottom: 100px;
+      background: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .predict-page::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 15s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    .predict-page::after {
+      content: '';
+      position: fixed;
+      bottom: -30%;
+      left: -5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 20s ease-in-out infinite reverse;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.05); }
+      66% { transform: translate(-20px, 50px) scale(0.95); }
+    }
+
+    .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+    .predict-page > .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .predict-header {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 16px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--rose);
+    }
+
+    .predict-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+      font-family: var(--font-display);
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .text-teal {
+      color: #00d4aa;
+    }
+
+    .predict-header p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 16px auto 0;
+      line-height: 1.6;
+    }
+    .pdf-smart-fill {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      animation: slideDown 0.6s ease-out 0.1s both;
+    }
+
+    .pdf-smart-fill::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--rose), #b030f0);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .pdf-smart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.3s;
+    }
+
+    .pdf-smart-header:hover {
+      opacity: 0.8;
+    }
+
+    .pdf-smart-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .pdf-smart-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1.5px solid rgba(236, 72, 153, 0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.1);
+    }
+
+    .pdf-smart-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+
+    .pdf-smart-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .pdf-smart-toggle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+    }
+
+    .pdf-smart-toggle.open {
+      transform: rotate(180deg);
+    }
+
+    .pdf-smart-body {
+      margin-top: 20px;
+      animation: expandDown 0.4s ease-out;
+    }
+
+    @keyframes expandDown {
+      from {
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+      }
+      to {
+        opacity: 1;
+        max-height: 1000px;
+      }
+    }
+
+    .pdf-smart-body.hidden {
+      display: none;
+    }
+
+    .pdf-dropzone {
+      border: 2.5px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 40px 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--bg-glass);
+      position: relative;
+    }
+
+    .pdf-dropzone:hover,
+    .pdf-dropzone.dragover {
+      border-color: var(--rose);
+      background: var(--rose-dim);
+      box-shadow: 0 12px 40px rgba(247,45,110,0.15);
+      transform: translateY(-2px);
+    }
+
+    .pdf-dropzone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 14px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .pdf-dropzone-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+
+    .pdf-dropzone-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .pdf-browse-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 9px 22px;
+      background: var(--rose-dim);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--rose);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: var(--font-body);
+    }
+
+    .pdf-browse-btn:hover {
+      background: rgba(247,45,110,0.2);
+      border-color: var(--rose);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(247,45,110,0.2);
+    }
+
+    .pdf-extracted {
+      margin-top: 20px;
+      display: none;
+      animation: slideDown 0.4s ease-out;
+    }
+
+    .pdf-extracted.show {
+      display: block;
+    }
+
+    .pdf-extracted-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .pdf-extracted-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--rose);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: var(--font-mono);
+    }
+
+    .pdf-extracted-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .pdf-extracted-item {
+      background: var(--rose-dim);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      transition: all 0.3s;
+    }
+
+    .pdf-extracted-item:hover {
+      border-color: var(--rose);
+      background: rgba(247,45,110,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(247,45,110,0.1);
+    }
+
+    .pdf-extracted-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .pdf-extracted-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--rose);
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    .pdf-autofill-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--rose), #8b5cf6);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-body);
+      box-shadow: 0 8px 24px rgba(247,45,110,0.3);
+    }
+
+    .pdf-autofill-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(247,45,110,0.4);
+      background: linear-gradient(135deg, var(--pink-600), #7c3aed);
+    }
+
+    .pdf-autofill-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .pdf-status {
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      animation: slideDown 0.3s ease-out;
+      font-weight: 500;
+    }
+
+    .pdf-status.show {
+      display: flex;
+    }
+
+    .pdf-status.success {
+      background: rgba(0, 212, 170, 0.1);
+      border: 1px solid rgba(0, 212, 170, 0.3);
+      color: #00d4aa;
+    }
+
+    .pdf-status.error {
+      background: rgba(255, 95, 126, 0.1);
+      border: 1px solid rgba(255, 95, 126, 0.3);
+      color: #ff5f7e;
+    }
+
+    .pdf-status.loading {
+      background: rgba(236, 72, 153, 0.1);
+      border: 1px solid rgba(236, 72, 153, 0.2);
+      color: #ec4899;
+    }
+
+    .step-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 40px 0 50px;
+      animation: slideDown 0.6s ease-out 0.2s both;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: all 0.4s;
+    }
+
+    .step.active,
+    .step.done {
+      opacity: 1;
+    }
+
+    .step-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card2);
+      border: 2px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: all 0.4s;
+      font-family: var(--font-mono);
+    }
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: all 0.4s;
+      font-family: var(--font-mono);
+    }
+
+    .step.active .step-dot {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: white;
+      box-shadow: 0 8px 24px rgba(247,45,110,0.35);
+      transform: scale(1.1);
+    }
+
+    .step.done .step-dot {
+      background: linear-gradient(135deg, #00d4aa, #06b6d4);
+      border-color: #00d4aa;
+      color: white;
+      box-shadow: 0 8px 24px rgba(0, 212, 170, 0.2);
+    }
+
+    .step-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+      transition: color 0.4s;
+      font-family: var(--font-body);
+    }
+
+    .step.active .step-label,
+    .step.done .step-label {
+      color: var(--text-primary);
+    }
+
+    .step-line {
+      width: 40px;
+      height: 2px;
+      background: var(--border-soft);
+      transition: all 0.4s;
+    }
+
+    .step-line.done {
+      background: linear-gradient(90deg, #00d4aa, #06b6d4);
+      box-shadow: 0 4px 12px rgba(0, 212, 170, 0.2);
+    }
+
+    .step-valid-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00d4aa;
+      display: inline-block;
+      margin-left: 6px;
+      vertical-align: middle;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 0 8px rgba(0, 212, 170, 0.4);
+    }
+
+    .step-valid-dot.show {
+      opacity: 1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(0, 212, 170, 0.4); }
+      50% { box-shadow: 0 0 16px rgba(0, 212, 170, 0.6); }
+    }
+
+    .predict-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 32px;
+      animation: slideDown 0.6s ease-out 0.3s both;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 1024px) {
+      .predict-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      color: var(--text-primary);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+    .form-card {
+      width: 100%;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--rose), #b030f0);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-grid-2,
+.form-grid-3 {
+  align-items: start;
+}
+
+    .panel-title {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .panel-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      animation: slideDown 0.6s ease-out;
+    }
+
+    .panel-icon-teal {
+      background: linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(6, 182, 212, 0.1));
+      border: 1px solid rgba(0, 212, 170, 0.2);
+    }
+
+    .panel-icon-azure {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(77, 158, 255, 0.1));
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .panel-icon-gold {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .panel-title h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+      font-family: var(--font-body);
+    }
+
+    .panel-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .form-section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 24px 0 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: var(--font-body);
+      padding-left: 8px;
+      border-left: 3px solid var(--rose);
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .form-grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .label-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      text-transform: none;
+      margin-left: 4px;
+    }
+
+    .label-unit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      text-transform: none;
+      margin-left: 4px;
+    }
+
+    .req {
+      color: #ec4899;
+      font-weight: 700;
+    }
+
+    .input-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 1.1rem;
+      pointer-events: none;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+    }
+
+    .form-control::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-control:hover {
+      border-color: rgba(247,45,110,0.35);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--rose);
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 0 0 3px rgba(247,45,110,0.15);
+    }
+
+    .form-control.invalid {
+      border-color: #ff5f7e !important;
+      background: rgba(255, 95, 126, 0.08) !important;
+      box-shadow: 0 0 0 3px rgba(255, 95, 126, 0.12) !important;
+    }
+
+    select.form-control {
+      padding-left: 14px;
+      cursor: pointer;
+      color: var(--text-primary);
+      background-color: var(--bg-card2);
+    }
+
+    select.form-control option {
+      background: var(--bg-card2);
+      color: var(--text-primary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 12px 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--bg-deep);
+      border: 2.5px solid var(--rose);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(247,45,110,0.3);
+      transition: all 0.3s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 6px 20px rgba(247,45,110,0.4);
+      transform: scale(1.2);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--bg-deep);
+      border: 2.5px solid var(--rose);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(247,45,110,0.3);
+      transition: all 0.3s;
+    }
+
+    input[type="range"]::-moz-range-thumb:hover {
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+      transform: scale(1.2);
+    }
+
+    .range-current {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--rose);
+      display: block;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .range-val {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .bmi-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-left: auto;
+    }
+    :root,
+    body,
+    body[data-theme="dark"] {
+      --bg-main: var(--bg-deep);
+      --card-bg: var(--bg-card);
+    }
+
+    body[data-theme="light"] {
+      background: #f8f0fc;
+      color: #1f2937;
+    }
+
+    .badge-teal {
+      background: rgba(0, 212, 170, 0.15);
+      color: #00d4aa;
+      border: 1px solid rgba(0, 212, 170, 0.3);
+    }
+
+    .badge-azure {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-gold {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-rose {
+      background: rgba(255, 95, 126, 0.15);
+      color: #ff5f7e;
+      border: 1px solid rgba(255, 95, 126, 0.3);
+    }
+
+    .field-error {
+      font-size: 0.75rem;
+      color: #ff5f7e;
+      margin-top: 6px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .field-error.show {
+      display: flex;
+    }
+
+    .form-error-banner {
+      background: rgba(255, 95, 126, 0.1);
+      border: 1.5px solid rgba(255, 95, 126, 0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      color: #ff5f7e;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .form-error-banner.show {
+      display: flex;
+    }
+
+    .symptom-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 16px 0 24px;
+    }
+
+    .symptom-toggle input[type="checkbox"] {
+      display: none;
+    }
+
+    .symptom-toggle {
+      position: relative;
+    }
+
+    .symptom-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 12px;
+      background: var(--bg-glass);
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .symptom-toggle input[type="checkbox"]:checked + .symptom-label {
+      background: var(--rose-dim);
+      border-color: var(--rose);
+      color: var(--text-primary);
+      box-shadow: 0 6px 16px rgba(247,45,110,0.15);
+      transform: translateY(-2px);
+    }
+
+    .sym-icon {
+      font-size: 1.8rem;
+      display: block;
+    }
+
+    .sym-check {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--border-soft);
+      margin-top: 4px;
+      transition: all 0.3s;
+    }
+
+    .symptom-toggle input[type="checkbox"]:checked + .symptom-label .sym-check {
+      background: var(--rose);
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(247,45,110,0.2);
+    }
+
+    .image-dropzone {
+      border: 2.5px dashed rgba(247,45,110,0.25);
+      border-radius: var(--radius-md);
+      padding: 40px 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--bg-glass);
+      position: relative;
+      margin: 16px 0;
+    }
+
+    .image-dropzone:hover,
+    .image-dropzone.dragover {
+      border-color: var(--rose);
+      background: var(--rose-dim);
+      box-shadow: 0 12px 40px rgba(247,45,110,0.15);
+      transform: translateY(-2px);
+    }
+
+    .dropzone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 14px;
+      display: block;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .dropzone-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      font-family: var(--font-body);
+    }
+
+    .dropzone-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    #upload-filename {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .upload-clear {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .upload-clear:hover {
+      background: rgba(0, 0, 0, 0.7);
+      transform: scale(1.1);
+    }
+
+    #ready-summary {
+      background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(6, 182, 212, 0.08));
+      border: 1.5px solid rgba(0, 212, 170, 0.25);
+      border-radius: 12px;
+      padding: 16px;
+      animation: slideDown 0.4s ease-out;
+    }
+
+    #ready-summary p {
+      color: #00d4aa;
+      margin: 0;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-soft);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      font-family: var(--font-body);
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--rose);
+      color: white;
+      box-shadow: 0 4px 20px rgba(247,45,110,0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--pink-600);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(247,45,110,0.48);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--rose);
+      border: 1.5px solid var(--rose);
+      box-shadow: 0 4px 12px rgba(247,45,110,0.1);
+    }
+
+    .btn-outline:hover {
+      background: var(--rose-dim);
+      border-color: var(--rose-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(247,45,110,0.2);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    .btn-lg {
+      padding: 14px 32px;
+      font-size: 0.95rem;
+    }
+
+    #btn-next:disabled,
+    #btn-next[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn-clear-form {
+      padding: 10px 18px;
+      background: transparent;
+      border: 1.5px solid rgba(255, 95, 126, 0.3);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255, 95, 126, 0.8);
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+      font-family: var(--font-body);
+    }
+
+    .btn-clear-form:hover {
+      background: rgba(255, 95, 126, 0.08);
+      border-color: rgba(255, 95, 126, 0.5);
+      color: #ff5f7e;
+      transform: translateY(-2px);
+    }
+
+    .ref-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+      position: sticky;
+      top: calc(var(--nav-h) + 50px);
+      max-height: calc(100vh - var(--nav-h) - 100px);
+      overflow-y: auto;
+      animation: slideDown 0.6s ease-out 0.4s both;
+    }
+    
+    .ref-panel {
+      width: 100%;
+      position: sticky;
+      top: 100px;
+    }
+
+    @media (max-width: 1024px) {
+      .ref-panel {
+        position: relative;
+        top: auto;
+        max-height: none;
+      }
+      .predict-layout {
+    grid-template-columns: 1fr;
+  }
+    }
+
+    .ref-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--rose);
+      font-family: var(--font-body);
+    }
+
+    .ref-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .ref-item:hover {
+      padding-left: 6px;
+      color: var(--rose);
+    }
+
+    .ref-name {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+    }
+
+    .ref-range {
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--rose), var(--pink-400));
+      border-radius: 3px;
+      box-shadow: 0 0 12px rgba(247,45,110,0.3);
+    }
+
+    .optional-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-left: 8px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .form-card {
+        padding: 24px;
+      }
+
+      .predict-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .step-bar {
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .step-line {
+        width: 100%;
+        height: 2px;
+        order: 3;
+      }
+
+      .pdf-extracted-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .form-nav {
+        flex-direction: column;
+      }
+
+      .form-nav > * {
+        width: 100%;
+      }
+
+      .form-nav > div {
+        width: auto;
+      }
+    }
+
+    .reveal {
+      animation: slideDown 0.6s ease-out;
+    }
+
+  </style>
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <a href="index.html" class="nav-logo">
+       <img src="assets/images/polycarelogo.png" style="height:40px;">
+       <div class="nav-brand-text">
+      <span class="nav-brand-name">POLY<span>CARE</span></span>
+    </div>
+    </a>
+  </div>
+  
+
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="about.html" class="nav-link">About</a>
+    <span id="server-status" class="badge badge-teal">● Checking…</span>
+    <button class="dark-toggle" title="Toggle theme">☀️</button>
+  </div>
+</nav>
+
+<main class="predict-page">
+  <div class="container">
+
+    <div class="predict-header reveal">
+      <div class="eyebrow">AI Diagnosis Tool</div>
+      <h1>PCOS Analysis <span class="text-teal">Form</span></h1>
+      <p>Complete all three steps to generate your multimodal AI assessment. All fields are processed securely — no data is stored.</p>
+    </div>
+
+    <div class="pdf-smart-fill reveal" id="pdf-smart-section">
+      <div class="pdf-smart-header" id="pdf-toggle-header" onclick="POLYCARE.togglePdfSection()">
+        <div class="pdf-smart-header-left">
+          <div class="pdf-smart-icon">📄</div>
+          <div>
+            <div class="pdf-smart-title">📋 Smart Lab Report Fill</div>
+            <div class="pdf-smart-sub">Upload your PDF lab report — values are auto-extracted and filled into the form</div>
+          </div>
+        </div>
+        <div class="pdf-smart-toggle" id="pdf-chevron">▼</div>
+      </div>
+
+      <div class="pdf-smart-body hidden" id="pdf-smart-body">
+        <input type="file" id="pdf-report-file" accept="application/pdf" style="display:none">
+
+        <div class="pdf-dropzone" id="pdf-dropzone"
+             onclick="document.getElementById('pdf-report-file').click()"
+             ondragover="POLYCARE.pdfDragOver(event)"
+             ondragleave="POLYCARE.pdfDragLeave(event)"
+             ondrop="POLYCARE.pdfDrop(event)">
+          <div class="pdf-dropzone-icon">📄</div>
+          <div class="pdf-dropzone-title" id="pdf-dz-title">Drop your lab report PDF here</div>
+          <div class="pdf-dropzone-sub">Supports standard hormone panel reports · PDF only · Max 10 MB</div>
+          <div class="pdf-browse-btn" onclick="event.stopPropagation(); document.getElementById('pdf-report-file').click()">
+            Browse File
+          </div>
+        </div>
+
+        <div class="pdf-status" id="pdf-status"></div>
+
+        <div class="pdf-extracted" id="pdf-extracted">
+          <div class="pdf-extracted-header">
+            <div class="pdf-extracted-title">✨ Extracted Values</div>
+            <span id="pdf-extracted-count" style="font-size:0.76rem;color:var(--text-muted)"></span>
+          </div>
+          <div class="pdf-extracted-grid" id="pdf-extracted-grid"></div>
+          <button class="pdf-autofill-btn" onclick="POLYCARE.autofillFromPdf()">
+            ⚡ Autofill Form with Extracted Values
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-bar">
+      <div class="step active" id="step-1">
+        <div class="step-dot">01</div>
+        <span class="step-label">Patient Info<span class="step-valid-dot" id="step-1-valid"></span></span>
+      </div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step" id="step-2">
+        <div class="step-dot">02</div>
+        <span class="step-label">Hormones &amp; Labs<span class="step-valid-dot" id="step-2-valid"></span></span>
+      </div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step" id="step-3">
+        <div class="step-dot">03</div>
+        <span class="step-label">Symptoms &amp; Image</span>
+      </div>
+    </div>
+
+    <div class="predict-layout">
+
+      <div class="form-card reveal">
+
+        <div id="panel-1">
+          <div class="panel-title">
+            <div class="panel-icon panel-icon-teal">👤</div>
+            <div>
+              <h3>Patient Information</h3>
+              <p>Demographics, vitals &amp; menstrual data</p>
+            </div>
+          </div>
+
+          <div class="form-error-banner" id="error-banner-1">
+            <span>⚠️</span>
+            <span id="error-banner-1-text">Please fill all required fields before proceeding.</span>
+          </div>
+
+          <div class="form-section-title">Patient &amp; Clinician Details</div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Patient Name</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">👩</span>
+                <input type="text" class="form-control" id="inp-patient-name" placeholder="e.g. Priya Sharma">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Referring Physician</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🩺</span>
+                <input type="text" class="form-control" id="inp-doctor-name" placeholder="e.g. Dr. Anjali Rao">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-title">Demographics</div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Age <span class="req">*</span> <span class="label-hint">years (12–60)</span></label>
+              <div style="margin-bottom:8px">
+                <span class="range-current" id="age-display">25 yrs</span>
+              </div>
+              <input type="range" id="inp-age" min="12" max="60" value="25"
+                     oninput="document.getElementById('age-display').textContent=this.value+' yrs'; POLYCARE.checkStep1()">
+              <div class="range-val"><span>12</span><span>60</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                BMI <span class="req">*</span>
+                <span class="label-unit">kg/m²</span>
+                <span id="bmi-badge" class="bmi-badge badge-teal" style="display:none">Normal</span>
+              </label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">⚖️</span>
+                <input type="number" class="form-control" id="inp-bmi"
+                       placeholder="e.g. 24.5" min="10" max="60" step="0.1"
+                       oninput="POLYCARE.checkStep1()">
+              </div>
+              <div class="field-error" id="err-bmi">⚠ Enter a valid BMI (10–60)</div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Weight <span class="req">*</span> <span class="label-unit">kg</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🏋️</span>
+                <input type="number" class="form-control" id="inp-weight"
+                       placeholder="e.g. 62" min="30" max="180"
+                       oninput="POLYCARE.autoBMI(); POLYCARE.checkStep1()">
+              </div>
+              <div class="field-error" id="err-weight">⚠ Enter a valid weight (30–180 kg)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Height <span class="req">*</span> <span class="label-unit">cm</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">📏</span>
+                <input type="number" class="form-control" id="inp-height"
+                       placeholder="e.g. 162" min="100" max="220"
+                       oninput="POLYCARE.autoBMI(); POLYCARE.checkStep1()">
+              </div>
+              <div class="field-error" id="err-height">⚠ Enter a valid height (100–220 cm)</div>
+            </div>
+          </div>
+
+          <div class="form-section-title">Menstrual Data</div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Cycle Length <span class="label-unit">days</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">📅</span>
+                <input type="number" class="form-control" id="inp-cycle"
+                       placeholder="21–45" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cycle Regularity <span class="req">*</span></label>
+              <select class="form-control" id="inp-cycle-reg"
+                      onchange="POLYCARE.checkStep1()">
+                <option value="">— Select —</option>
+                <option value="1">Regular</option>
+                <option value="0">Irregular</option>
+              </select>
+              <div class="field-error" id="err-cycle-reg">⚠ Please select cycle regularity</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Follicles (L ovary)</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🔵</span>
+                <input type="number" class="form-control" id="inp-follicle-l"
+                       placeholder="e.g. 5" min="0" max="40">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Follicles (R ovary)</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🔵</span>
+                <input type="number" class="form-control" id="inp-follicle-r"
+                       placeholder="e.g. 5" min="0" max="40">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Avg Follicle Size L <span class="label-unit">mm</span></label>
+              <input type="number" class="form-control" id="inp-fsize-l"
+                     placeholder="e.g. 8" min="1" max="30" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Avg Follicle Size R <span class="label-unit">mm</span></label>
+              <input type="number" class="form-control" id="inp-fsize-r"
+                     placeholder="e.g. 8" min="1" max="30" step="0.1">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Waist <span class="label-unit">cm<command></span></label>
+              <input type="number" class="form-control" id="inp-waist"
+                     placeholder="e.g. 30" min="20" max="70" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hip <span class="label-unit">cm</span></label>
+              <input type="number" class="form-control" id="inp-hip"
+                     placeholder="e.g. 38" min="24" max="80" step="0.1">
+            </div>
+          </div>
+
+          <div class="form-section-title">Blood Pressure &amp; Vitals</div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Systolic BP <span class="label-unit">mmHg</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🫀</span>
+                <input type="number" class="form-control" id="inp-sys-bp"
+                       placeholder="90–180" min="70" max="200">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Diastolic BP <span class="label-unit">mmHg</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🫀</span>
+                <input type="number" class="form-control" id="inp-dia-bp"
+                       placeholder="60–120" min="40" max="140">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pulse Rate <span class="label-unit">bpm</span></label>
+              <input type="number" class="form-control" id="inp-pulse"
+                     placeholder="e.g. 72" min="40" max="180">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Endometrium Thickness <span class="label-unit">mm</span></label>
+              <input type="number" class="form-control" id="inp-endometrium"
+                     placeholder="e.g. 7" min="1" max="30" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Haemoglobin <span class="label-unit">g/dL</span></label>
+              <input type="number" class="form-control" id="inp-hb"
+                     placeholder="e.g. 12.5" min="4" max="20" step="0.1">
+            </div>
+          </div>
+        </div>
+        <div id="panel-2" style="display:none">
+          <div class="panel-title">
+            <div class="panel-icon panel-icon-azure">🧪</div>
+            <div>
+              <h3>Hormones &amp; Lab Values</h3>
+              <p>Serum hormone levels &amp; metabolic markers</p>
+            </div>
+          </div>
+
+          <div class="form-error-banner" id="error-banner-2">
+            <span>⚠️</span>
+            <span id="error-banner-2-text">Please fill all required hormone fields before proceeding.</span>
+          </div>
+
+          <div class="form-section-title">Reproductive Hormones <span style="font-size:0.7rem;font-weight:400;color:var(--text-muted);margin-left:8px">(Required for accurate prediction)</span></div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">LH <span class="req">*</span> <span class="label-unit">mIU/mL</span>
+                <span class="label-hint">Normal: 2–15</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">💉</span>
+                <input type="number" class="form-control" id="inp-lh"
+                       placeholder="e.g. 8.5" min="0" max="200" step="0.1"
+                       oninput="POLYCARE.updateRatioHint(); POLYCARE.checkStep2()">
+              </div>
+              <span id="lh-fsh-hint" style="font-size:0.75rem;margin-top:4px;display:block"></span>
+              <div class="field-error" id="err-lh">⚠ LH is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">FSH <span class="req">*</span> <span class="label-unit">mIU/mL</span>
+                <span class="label-hint">Normal: 3–10</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">💉</span>
+                <input type="number" class="form-control" id="inp-fsh"
+                       placeholder="e.g. 5.2" min="0" max="200" step="0.1"
+                       oninput="POLYCARE.updateRatioHint(); POLYCARE.checkStep2()">
+              </div>
+              <div class="field-error" id="err-fsh">⚠ FSH is required</div>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">AMH <span class="req">*</span> <span class="label-unit">ng/mL</span>
+                <span class="label-hint">Normal: 1–3.5</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🔬</span>
+                <input type="number" class="form-control" id="inp-amh"
+                       placeholder="e.g. 3.8" min="0" max="50" step="0.1"
+                       oninput="POLYCARE.checkStep2()">
+              </div>
+              <div class="field-error" id="err-amh">⚠ AMH is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">TSH <span class="label-unit">mIU/L</span>
+                <span class="label-hint">Normal: 0.4–4.0</span></label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🔬</span>
+                <input type="number" class="form-control" id="inp-tsh"
+                       placeholder="e.g. 1.8" min="0" max="100" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Prolactin <span class="label-unit">ng/mL</span>
+                <span class="label-hint">Normal: 2–29</span></label>
+              <input type="number" class="form-control" id="inp-prolactin"
+                     placeholder="e.g. 14" min="0" max="500" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Progesterone <span class="label-unit">ng/mL</span></label>
+              <input type="number" class="form-control" id="inp-prg"
+                     placeholder="e.g. 0.8" min="0" max="50" step="0.1">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Vitamin D3 <span class="label-unit">ng/mL</span></label>
+              <input type="number" class="form-control" id="inp-vitd3"
+                     placeholder="e.g. 28" min="0" max="150" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">RBS / Glucose <span class="label-unit">mg/dL</span></label>
+              <input type="number" class="form-control" id="inp-glucose"
+                     placeholder="70–140" min="50" max="600">
+            </div>
+          </div>
+          </div>
+
+        <div id="panel-3" style="display:none">
+          <div class="panel-title">
+            <div class="panel-icon panel-icon-gold">🩺</div>
+            <div>
+              <h3>Symptoms &amp; Ultrasound</h3>
+              <p>Clinical symptoms &amp; optional ultrasound image</p>
+            </div>
+          </div>
+
+          <div class="form-section-title">Clinical Symptoms
+            <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;letter-spacing:0;margin-left:8px">Select all that apply</span>
+          </div>
+          <div class="symptom-grid">
+            <div class="symptom-toggle">
+              <input type="checkbox" id="sym-pimples" value="1">
+              <label class="symptom-label" for="sym-pimples">
+                <span class="sym-icon">😓</span>Pimples / Acne<span class="sym-check"></span>
+              </label>
+            </div>
+            <div class="symptom-toggle">
+              <input type="checkbox" id="sym-hair-growth" value="1">
+              <label class="symptom-label" for="sym-hair-growth">
+                <span class="sym-icon">🧖</span>Excess Hair Growth<span class="sym-check"></span>
+              </label>
+            </div>
+            <div class="symptom-toggle">
+              <input type="checkbox" id="sym-weight-gain" value="1">
+              <label class="symptom-label" for="sym-weight-gain">
+                <span class="sym-icon">⚖️</span>Weight Gain<span class="sym-check"></span>
+              </label>
+            </div>
+            <div class="symptom-toggle">
+              <input type="checkbox" id="sym-skin-dark" value="1">
+              <label class="symptom-label" for="sym-skin-dark">
+                <span class="sym-icon">🌑</span>Skin Darkening<span class="sym-check"></span>
+              </label>
+            </div>
+            <div class="symptom-toggle">
+              <input type="checkbox" id="sym-fast-food" value="1">
+              <label class="symptom-label" for="sym-fast-food">
+                <span class="sym-icon">🍔</span>Fast Food Habit<span class="sym-check"></span>
+              </label>
+            </div>
+            <div class="symptom-toggle">
+              <input type="checkbox" id="sym-exercise" value="1">
+              <label class="symptom-label" for="sym-exercise">
+                <span class="sym-icon">🏃</span>Regular Exercise<span class="sym-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section-title">
+            Ultrasound Image Upload
+          </div>
+
+          <div id="image-dropzone" class="image-dropzone">
+            <input type="file" id="ultrasound-image" accept="image/*" style="display:none">
+            <button class="upload-clear" id="clear-image" title="Remove image">✕</button>
+            <span class="dropzone-icon">🖼️</span>
+            <div class="dropzone-title">Drop ultrasound image here</div>
+            <div class="dropzone-sub">
+              PNG, JPEG, WebP · Max 16 MB<br>
+              Pelvic / transvaginal ultrasound scan preferred
+            </div>
+            <div id="preview-wrap" style="display:none">
+              <img id="image-preview" src="" alt="Uploaded scan">
+              <span id="upload-filename"></span>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;padding:16px;background:rgba(247,45,110,0.06);border:1.5px solid rgba(247,45,110,0.15);border-radius:12px">
+            <p style="font-size:0.85rem;color:var(--text-secondary);margin:0;line-height:1.7">
+              💡 <strong>Without image:</strong> prediction uses structured data only (still highly accurate).<br>
+              <strong>With image:</strong> multimodal fusion activates for maximum accuracy.
+            </p>
+          </div>
+
+          <div id="ready-summary" style="margin-top:28px;display:none">
+            <p>✅ Data collected. Click <strong>Run AI Analysis</strong> to generate your assessment.</p>
+          </div>
+        </div>
+
+        <div class="form-nav">
+          <button id="btn-prev" class="btn btn-ghost"
+                  onclick="POLYCARE.prevStep()" style="display:none">
+            ← Previous
+          </button>
+          <div style="display:flex;gap:10px;margin-left:auto;align-items:center;flex-wrap:wrap">
+            <button class="btn-clear-form" onclick="POLYCARE.clearForm()">🗑 Clear Form</button>
+            <button id="btn-next" class="btn btn-outline"
+                    onclick="POLYCARE.nextStep()">
+              Next Step →
+            </button>
+            <button id="btn-submit" class="btn btn-primary btn-lg"
+                    style="display:none" onclick="POLYCARE.submitPrediction()">
+              🔬 Run AI Analysis
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <aside class="ref-panel reveal">
+        <div class="ref-title">⚕️ Normal Ranges</div>
+        <div class="ref-item"><span class="ref-name">BMI</span><span class="ref-range">18.5 – 24.9</span></div>
+        <div class="ref-item"><span class="ref-name">LH</span><span class="ref-range">2 – 15 mIU/mL</span></div>
+        <div class="ref-item"><span class="ref-name">FSH</span><span class="ref-range">3 – 10 mIU/mL</span></div>
+        <div class="ref-item"><span class="ref-name">AMH</span><span class="ref-range">1 – 3.5 ng/mL</span></div>
+        <div class="ref-item"><span class="ref-name">TSH</span><span class="ref-range">0.4 – 4.0 mIU/L</span></div>
+        <div class="ref-item"><span class="ref-name">Prolactin</span><span class="ref-range">2 – 29 ng/mL</span></div>
+        <div class="ref-item"><span class="ref-name">Glucose</span><span class="ref-range">70 – 140 mg/dL</span></div>
+        <div class="ref-item"><span class="ref-name">Systolic BP</span><span class="ref-range">90 – 120 mmHg</span></div>
+        <div class="ref-item"><span class="ref-name">Cycle</span><span class="ref-range">21 – 35 days</span></div>
+        <div class="ref-item"><span class="ref-name">Follicles</span><span class="ref-range">&lt; 12 per ovary</span></div>
+
+        <div style="margin-top:20px;padding:14px;background:rgba(236,72,153,0.06);border:1.5px solid rgba(236,72,153,0.15);border-radius:12px">
+          <p style="font-size:0.8rem;color:var(--text-muted);margin:0;line-height:1.7">
+            Values outside normal ranges may indicate PCOS risk. Partial data is accepted — the more complete, the better.
+          </p>
+        </div>
+
+        <div style="margin-top:24px">
+          <div class="ref-title">🤖 AI Models</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem">
+              <span style="color:#06b6d4;font-weight:700">●</span>
+              <span style="color:var(--text-primary);font-weight:500">Random Forest</span>
+              <span class="badge badge-teal" style="margin-left:auto;font-size:0.65rem">97.2%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem">
+              <span style="color:#f59e0b;font-weight:700">●</span>
+              <span style="color:var(--text-primary);font-weight:500">XGBoost</span>
+              <span class="badge badge-gold" style="margin-left:auto;font-size:0.65rem">96.8%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem">
+              <span style="color:#00d4aa;font-weight:700">●</span>
+              <span style="color:var(--text-primary);font-weight:500">CNN (EfficientNet)</span>
+              <span class="badge badge-teal" style="margin-left:auto;font-size:0.65rem">91%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem">
+              <span style="color:#ff5f7e;font-weight:700">●</span>
+              <span style="color:var(--text-primary);font-weight:500">Late Fusion</span>
+              <span class="badge badge-rose" style="margin-left:auto;font-size:0.65rem">95%</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:28px">
+          <div class="ref-title">📋 Form Progress</div>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.77rem;color:var(--text-muted);margin-bottom:6px">
+                <span style="font-weight:600">Patient Info</span>
+                <span id="progress-step1-label" style="color:var(--text-muted);font-weight:600">Incomplete</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progress-step1" style="width:0%;transition:width 0.4s;background:linear-gradient(90deg,#ec4899,#8b5cf6)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.77rem;color:var(--text-muted);margin-bottom:6px">
+                <span style="font-weight:600">Hormones</span>
+                <span id="progress-step2-label" style="color:var(--text-muted);font-weight:600">Incomplete</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progress-step2" style="width:0%;transition:width 0.4s;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</main>
+<script src="script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  window._extractedPdfValues = null;
+
+  POLYCARE.togglePdfSection = function() {
+    const body    = document.getElementById('pdf-smart-body');
+    const chevron = document.getElementById('pdf-chevron');
+    const isOpen  = !body.classList.contains('hidden');
+    body.classList.toggle('hidden', isOpen);
+    chevron.classList.toggle('open', !isOpen);
+  };
+
+  POLYCARE.pdfDragOver = function(e) {
+    e.preventDefault();
+    document.getElementById('pdf-dropzone').classList.add('dragover');
+  };
+  POLYCARE.pdfDragLeave = function(e) {
+    document.getElementById('pdf-dropzone').classList.remove('dragover');
+  };
+  POLYCARE.pdfDrop = function(e) {
+    e.preventDefault();
+    document.getElementById('pdf-dropzone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+      POLYCARE.uploadPdfReport(file);
+    } else {
+      POLYCARE.showPdfStatus('Please upload a PDF file.', 'error');
+    }
+  };
+
+  document.getElementById('pdf-report-file').addEventListener('change', function() {
+    if (this.files[0]) POLYCARE.uploadPdfReport(this.files[0]);
+  });
+
+  POLYCARE.uploadPdfReport = async function(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      POLYCARE.showPdfStatus('File too large. Max 10 MB.', 'error');
+      return;
+    }
+    const dzTitle = document.getElementById('pdf-dz-title');
+    if (dzTitle) dzTitle.textContent = `📄 ${file.name}`;
+    POLYCARE.showPdfStatus('⏳ Extracting values from PDF…', 'loading');
+
+    try {
+      const fd = new FormData();
+      fd.append('pdf', file);
+      const resp = await fetch(`${API_BASE}/extract_pdf`, { method: 'POST', body: fd });
+      const data = await resp.json();
+
+      if (!resp.ok || !data.success) {
+        POLYCARE.showPdfStatus(`❌ ${data.error || 'Extraction failed. Try entering values manually.'}`, 'error');
+        return;
+      }
+
+      const extracted = data.extracted || {};
+      const count = Object.keys(extracted).length;
+      if (count === 0) {
+        POLYCARE.showPdfStatus('⚠️ No recognisable lab values found. Please fill fields manually.', 'error');
+        return;
+      }
+
+      window._extractedPdfValues = extracted;
+      POLYCARE.renderExtractedValues(extracted);
+      POLYCARE.showPdfStatus(`✅ Extracted ${count} value(s) successfully!`, 'success');
+    } catch (err) {
+      POLYCARE.showPdfStatus(`❌ Network error: ${err.message}`, 'error');
+    }
+  };
+
+  POLYCARE.showPdfStatus = function(msg, type) {
+    const el = document.getElementById('pdf-status');
+    el.textContent = msg;
+    el.className = `pdf-status show ${type}`;
+  };
+
+  POLYCARE.renderExtractedValues = function(vals) {
+    const grid  = document.getElementById('pdf-extracted-grid');
+    const count = document.getElementById('pdf-extracted-count');
+    const panel = document.getElementById('pdf-extracted');
+
+    const labels = {
+      LH:'LH', FSH:'FSH', AMH:'AMH', TSH:'TSH', PRL:'Prolactin',
+      RBS:'Glucose', Hb:'Haemoglobin', BMI:'BMI',
+      bp_systolic:'Systolic BP', bp_diastolic:'Diastolic BP', PRG:'Progesterone',
+      vitD3:'Vit D3',fat:'fat'
+    };
+    const units = {
+      LH:'mIU/mL', FSH:'mIU/mL', AMH:'ng/mL', TSH:'mIU/L', PRL:'ng/mL',
+      RBS:'mg/dL', Hb:'g/dL', BMI:'kg/m²',
+      bp_systolic:'mmHg', bp_diastolic:'mmHg', PRG:'ng/mL', vitD3:'ng/mL',fat:25
+    };
+
+    grid.innerHTML = Object.entries(vals)
+      .filter(([k, v]) => v !== null && v !== undefined)
+      .map(([k, v]) => `
+        <div class="pdf-extracted-item">
+          <div class="pdf-extracted-label">${labels[k] || k} ${units[k] ? `(${units[k]})` : ''}</div>
+          <div class="pdf-extracted-val">${parseFloat(v).toFixed(2)}</div>
+        </div>`).join('');
+
+    count.textContent = `${Object.keys(vals).length} value(s) found`;
+    panel.classList.add('show');
+  };
+
+  POLYCARE.autofillFromPdf = function() {
+    const vals = window._extractedPdfValues;
+    if (!vals) return;
+
+    const map = {
+      LH:          'inp-lh',
+      FSH:         'inp-fsh',
+      AMH:         'inp-amh',
+      TSH:         'inp-tsh',
+      PRL:         'inp-prolactin',
+      RBS:         'inp-glucose',
+      Hb:          'inp-hb',
+      BMI:         'inp-bmi',
+      PRG:         'inp-prg',
+      vitD3:       'inp-vitd3',
+      fat:         'inp-fat',
+      bp_systolic: 'inp-sys-bp',
+      bp_diastolic:'inp-dia-bp',
+    };
+
+    let filled = 0;
+    for (const [key, id] of Object.entries(map)) {
+      if (vals[key] != null) {
+        const el = document.getElementById(id);
+        if (el) { el.value = parseFloat(vals[key]).toFixed(2); filled++; }
+      }
+    }
+
+    POLYCARE.updateRatioHint();
+    POLYCARE.checkStep1();
+    POLYCARE.checkStep2();
+
+    POLYCARE.showPdfStatus(`✅ Autofilled ${filled} field(s). Review and edit before submitting.`, 'success');
+    if (typeof showToast === 'function') {
+      showToast(`Autofilled ${filled} fields from PDF report!`, 'success');
+    }
+  };
+
+  POLYCARE.autoBMI = function() {
+    const w = parseFloat(document.getElementById('inp-weight').value);
+    const h = parseFloat(document.getElementById('inp-height').value);
+    const bmiEl = document.getElementById('inp-bmi');
+    if (w > 0 && h > 0) {
+      const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+      bmiEl.value = bmi;
+      POLYCARE.updateBmiBadge(parseFloat(bmi));
+    }
+  };
+
+  POLYCARE.updateBmiBadge = function(bmi) {
+    const badge = document.getElementById('bmi-badge');
+    if (!badge || !bmi) return;
+    badge.style.display = 'inline-block';
+    if      (bmi < 18.5) { badge.textContent='Underweight'; badge.className='bmi-badge badge-azure'; }
+    else if (bmi < 25)   { badge.textContent='Normal';      badge.className='bmi-badge badge-teal'; }
+    else if (bmi < 30)   { badge.textContent='Overweight';  badge.className='bmi-badge badge-gold'; }
+    else                 { badge.textContent='Obese';        badge.className='bmi-badge badge-rose'; }
+  };
+
+  document.getElementById('inp-bmi')?.addEventListener('input', function() {
+    POLYCARE.updateBmiBadge(parseFloat(this.value));
+  });
+
+  POLYCARE.updateRatioHint = function() {
+    const lh  = parseFloat(document.getElementById('inp-lh')?.value) || 0;
+    const fsh = parseFloat(document.getElementById('inp-fsh')?.value) || 0;
+    const hint = document.getElementById('lh-fsh-hint');
+    if (!hint || !lh || !fsh) { if (hint) hint.textContent=''; return; }
+    const ratio = lh / fsh;
+    hint.textContent = `LH/FSH ratio: ${ratio.toFixed(2)} ${ratio > 2 ? '⚠️ Elevated' : '✓ Normal'}`;
+    hint.style.color = ratio > 2 ? '#ff5f7e' : '#00d4aa';
+  };
+
+  POLYCARE.checkStep1 = function() {
+    const bmi    = parseFloat(document.getElementById('inp-bmi').value);
+    const weight = parseFloat(document.getElementById('inp-weight').value);
+    const height = parseFloat(document.getElementById('inp-height').value);
+    const cycleReg = document.getElementById('inp-cycle-reg').value;
+
+    const hasBmi = (bmi >= 10 && bmi <= 60) ||
+                   (weight >= 30 && weight <= 180 && height >= 100 && height <= 220);
+    const hasCycle = cycleReg !== '';
+
+    const valid = hasBmi && hasCycle;
+
+    const pct = [hasBmi, hasCycle].filter(Boolean).length / 2 * 100;
+    document.getElementById('progress-step1').style.width = pct + '%';
+    document.getElementById('progress-step1-label').textContent =
+      valid ? '✓ Complete' : `${Math.round(pct)}%`;
+    document.getElementById('progress-step1-label').style.color =
+      valid ? '#00d4aa' : '#9ca3af';
+
+    document.getElementById('step-1-valid').classList.toggle('show', valid);
+
+    if (window._currentStep === 1) {
+      document.getElementById('btn-next').disabled = !valid;
+    }
+
+    return valid;
+  };
+
+  POLYCARE.checkStep2 = function() {
+    const lh  = parseFloat(document.getElementById('inp-lh').value);
+    const fsh = parseFloat(document.getElementById('inp-fsh').value);
+    const amh = parseFloat(document.getElementById('inp-amh').value);
+
+    const hasLH  = !isNaN(lh)  && lh > 0;
+    const hasFSH = !isNaN(fsh) && fsh > 0;
+    const hasAMH = !isNaN(amh) && amh >= 0;
+
+    const valid = hasLH && hasFSH && hasAMH;
+
+    const pct = [hasLH, hasFSH, hasAMH].filter(Boolean).length / 3 * 100;
+    document.getElementById('progress-step2').style.width = pct + '%';
+    document.getElementById('progress-step2-label').textContent =
+      valid ? '✓ Complete' : `${Math.round(pct)}%`;
+    document.getElementById('progress-step2-label').style.color =
+      valid ? '#00d4aa' : '#9ca3af';
+
+    document.getElementById('step-2-valid').classList.toggle('show', valid);
+
+    if (window._currentStep === 2) {
+      document.getElementById('btn-next').disabled = !valid;
+    }
+
+    return valid;
+  };
+
+  POLYCARE.showStep1Errors = function() {
+    const bmi    = parseFloat(document.getElementById('inp-bmi').value);
+    const weight = parseFloat(document.getElementById('inp-weight').value);
+    const height = parseFloat(document.getElementById('inp-height').value);
+    const cycleReg = document.getElementById('inp-cycle-reg').value;
+
+    const hasBmi = (bmi >= 10 && bmi <= 60) || (weight >= 30 && height >= 100);
+    const hasCycle = cycleReg !== '';
+
+    document.getElementById('err-bmi').classList.toggle('show', !hasBmi);
+    document.getElementById('inp-bmi').classList.toggle('invalid', !hasBmi && !weight && !height);
+    document.getElementById('err-cycle-reg').classList.toggle('show', !hasCycle);
+    document.getElementById('inp-cycle-reg').classList.toggle('invalid', !hasCycle);
+    document.getElementById('error-banner-1').classList.toggle('show', !hasBmi || !hasCycle);
+    const txt = [];
+    if (!hasBmi)   txt.push('BMI (or Weight + Height)');
+    if (!hasCycle) txt.push('Cycle Regularity');
+    document.getElementById('error-banner-1-text').textContent =
+      txt.length ? `Please fill required fields: ${txt.join(', ')}` : '';
+  };
+
+  POLYCARE.showStep2Errors = function() {
+    const lh  = parseFloat(document.getElementById('inp-lh').value);
+    const fsh = parseFloat(document.getElementById('inp-fsh').value);
+    const amh = parseFloat(document.getElementById('inp-amh').value);
+
+    const hasLH  = !isNaN(lh)  && lh > 0;
+    const hasFSH = !isNaN(fsh) && fsh > 0;
+    const hasAMH = !isNaN(amh) && amh >= 0;
+
+    document.getElementById('err-lh').classList.toggle('show', !hasLH);
+    document.getElementById('inp-lh').classList.toggle('invalid', !hasLH);
+    document.getElementById('err-fsh').classList.toggle('show', !hasFSH);
+    document.getElementById('inp-fsh').classList.toggle('invalid', !hasFSH);
+    document.getElementById('err-amh').classList.toggle('show', !hasAMH);
+    document.getElementById('inp-amh').classList.toggle('invalid', !hasAMH);
+    document.getElementById('error-banner-2').classList.toggle('show', !hasLH || !hasFSH || !hasAMH);
+    const txt = [];
+    if (!hasLH)  txt.push('LH');
+    if (!hasFSH) txt.push('FSH');
+    if (!hasAMH) txt.push('AMH');
+    document.getElementById('error-banner-2-text').textContent =
+      txt.length ? `Required hormone fields missing: ${txt.join(', ')}` : '';
+  };
+
+  window._currentStep = 1;
+
+  window.updateStepUI = function(step) {
+    for (let s = 1; s <= 3; s++) {
+      const panel = document.getElementById(`panel-${s}`);
+      if (panel) panel.style.display = s === step ? 'block' : 'none';
+      const dot = document.getElementById(`step-${s}`);
+      if (dot) {
+        dot.classList.remove('active', 'done');
+        if (s === step) dot.classList.add('active');
+        if (s < step)   dot.classList.add('done');
+      }
+    }
+    for (let l = 1; l <= 2; l++) {
+      const line = document.getElementById(`line-${l}`);
+      if (line) line.classList.toggle('done', l < step);
+    }
+    const prevBtn   = document.getElementById('btn-prev');
+    const nextBtn   = document.getElementById('btn-next');
+    const submitBtn = document.getElementById('btn-submit');
+    if (prevBtn)   prevBtn.style.display   = step > 1 ? 'inline-flex' : 'none';
+    if (nextBtn)   nextBtn.style.display   = step < 3 ? 'inline-flex' : 'none';
+    if (submitBtn) submitBtn.style.display = step === 3 ? 'inline-flex' : 'none';
+
+    if (step === 1) nextBtn && (nextBtn.disabled = !POLYCARE.checkStep1());
+    if (step === 2) nextBtn && (nextBtn.disabled = !POLYCARE.checkStep2());
+    if (step === 3) {
+      document.getElementById('ready-summary').style.display = 'block';
+    }
+
+    window._currentStep = step;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  POLYCARE.nextStep = function() {
+    const step = window._currentStep;
+    if (step === 1) {
+      if (!POLYCARE.checkStep1()) { POLYCARE.showStep1Errors(); return; }
+    }
+    if (step === 2) {
+      if (!POLYCARE.checkStep2()) { POLYCARE.showStep2Errors(); return; }
+    }
+    if (step < 3) window.updateStepUI(step + 1);
+  };
+
+  POLYCARE.prevStep = function() {
+    if (window._currentStep > 1) window.updateStepUI(window._currentStep - 1);
+  };
+
+  POLYCARE.clearForm = function() {
+    if (!confirm('Clear all form data? This cannot be undone.')) return;
+
+    document.querySelectorAll('.form-control').forEach(el => {
+      if (el.tagName === 'SELECT') el.value = '';
+      else el.value = '';
+      el.classList.remove('invalid');
+    });
+
+    const ageSlider = document.getElementById('inp-age');
+    if (ageSlider) { ageSlider.value = 25; document.getElementById('age-display').textContent = '25 yrs'; }
+
+    document.querySelectorAll('.symptom-toggle input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    const fInput = document.getElementById('ultrasound-image');
+    const prevW  = document.getElementById('preview-wrap');
+    const dz     = document.getElementById('image-dropzone');
+    if (fInput) fInput.value = '';
+    if (prevW)  prevW.style.display = 'none';
+    if (dz) {
+      dz.classList.remove('has-file');
+      const di = dz.querySelector('.dropzone-icon');
+      const dt = dz.querySelector('.dropzone-title');
+      const ds = dz.querySelector('.dropzone-sub');
+      if (di) di.style.display = 'block';
+      if (dt) dt.style.display = 'block';
+      if (ds) ds.style.display = 'block';
+    }
+
+    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.form-error-banner').forEach(el => el.classList.remove('show'));
+
+    const bBadge = document.getElementById('bmi-badge');
+    if (bBadge) bBadge.style.display = 'none';
+
+    const hint = document.getElementById('lh-fsh-hint');
+    if (hint) hint.textContent = '';
+
+    window._extractedPdfValues = null;
+    document.getElementById('pdf-extracted').classList.remove('show');
+    const pdfStatus = document.getElementById('pdf-status');
+    pdfStatus.className = 'pdf-status';
+    const pdfDzTitle = document.getElementById('pdf-dz-title');
+    if (pdfDzTitle) pdfDzTitle.textContent = 'Drop your lab report PDF here';
+    document.getElementById('pdf-report-file').value = '';
+
+    window.updateStepUI(1);
+
+    POLYCARE.checkStep1();
+    POLYCARE.checkStep2();
+
+    if (typeof showToast === 'function') showToast('Form cleared.', 'info');
+  };
+
+  const dz     = document.getElementById('image-dropzone');
+  const fInput = document.getElementById('ultrasound-image');
+  const prev   = document.getElementById('image-preview');
+  const prevW  = document.getElementById('preview-wrap');
+  const fname  = document.getElementById('upload-filename');
+  const clearBtn = document.getElementById('clear-image');
+
+  dz.addEventListener('click', e => { if (e.target === clearBtn) return; fInput.click(); });
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageFile(file);
+  });
+  fInput.addEventListener('change', () => { if (fInput.files[0]) handleImageFile(fInput.files[0]); });
+  clearBtn?.addEventListener('click', e => {
+    e.stopPropagation();
+    fInput.value = '';
+    prevW.style.display = 'none';
+    dz.classList.remove('has-file');
+    ['dropzone-icon','dropzone-title','dropzone-sub'].forEach(cls => {
+      const el = dz.querySelector('.'+cls);
+      if (el) el.style.display = 'block';
+    });
+  });
+
+  function handleImageFile(file) {
+    if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      if (prev) prev.src = e.target.result;
+      if (fname) fname.textContent = file.name;
+      if (prevW) prevW.style.display = 'block';
+      dz.classList.add('has-file');
+      ['dropzone-icon','dropzone-title','dropzone-sub'].forEach(cls => {
+        const el = dz.querySelector('.'+cls);
+        if (el) el.style.display = 'none';
+      });
+    };
+    reader.readAsDataURL(file);
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fInput.files = dt.files;
+  }
+
+  window.updateStepUI(1);
+  checkHealth();
+})
+document.querySelector(".dark-toggle").onclick = () => {
+  const body = document.body;
+  const current = body.getAttribute("data-theme");
+
+  if (current === "dark") {
+    body.setAttribute("data-theme", "light");
+  } else {
+    body.setAttribute("data-theme", "dark");
+  }
+};
+</script>
+<script>
+
+ 
+  (function () {
+    const pdfInput =
+      document.getElementById('pdf_upload') ||
+      document.getElementById('blood_report') ||
+      document.querySelector('input[type="file"][accept*="pdf"]') ||
+      document.querySelector('input[type="file"]');
+ 
+    if (!pdfInput) {
+      console.warn('[PDF Autofill] No file input found on page.');
+      return;
+    }
+ 
+    const statusEl = document.createElement('p');
+    statusEl.id = 'pdf_status';
+    statusEl.style.cssText =
+      'font-size:0.85rem;margin-top:6px;font-weight:500;';
+    pdfInput.insertAdjacentElement('afterend', statusEl);
+ 
+    function setStatus(msg, color) {
+      statusEl.textContent = msg;
+      statusEl.style.color = color || '#333';
+    }
+ 
+    function fillField(name, value) {
+      const el = document.querySelector(`[name="${name}"]`);
+      el.style.borderColor = "#ff6b9a";
+      if (el && value !== undefined && value !== null && el.value ==='') {
+        el.value = value;
+      }
+    }
+ 
+    pdfInput.addEventListener('change', async function () {
+      const file = this.files[0];
+      if (!file) return;
+ 
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        setStatus('⚠ Please select a PDF file.', '#c0392b');
+        return;
+      }
+ 
+      setStatus(' Extracting values from report…', '#555');
+ 
+      const formData = new FormData();
+      formData.append('file', file);
+ 
+      try {
+        const response = await fetch('/api/upload_pdf', {
+          method: 'POST',
+          body: formData,
+        });
+ 
+        const result = await response.json();
+ 
+        if (!result.success) {
+          setStatus(` ${result.error || 'Could not extract values.'}`, '#c0392b');
+          console.error('[PDF Autofill] Server error:', result.error);
+          return;
+        }
+ 
+        const d = result.data;
+ 
+        fillField('amh', d.amh);
+        fillField('lh',  d.lh);
+        fillField('fsh', d.fsh);
+        fillField('bmi', d.bmi);
+ 
+        const filled = Object.keys(d).join(', ').toUpperCase();
+        setStatus(`Auto-filled: ${filled}`, '#27ae60');
+        console.log('[PDF Autofill] Extracted:', d);
+ 
+      } catch (err) {
+        setStatus(' Upload failed. Check console for details.', '#c0392b');
+        console.error('[PDF Autofill] Fetch error:', err);
+      }
+    });
+  })();
+</script>
+ 
+
+</body>
+</html>

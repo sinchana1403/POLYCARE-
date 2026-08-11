@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POLYCARE – Analysis Results</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style_additions.css">
+  <style>
+
+    :root {
+      --pink-400: #ff5e98;
+      --pink-600: #d91559;
+
+      --rose:      #f72d6e;
+      --rose-soft: #ff7aaa;
+      --rose-dim:  rgba(247,45,110,0.12);
+
+      --bg-deep:  #2e1638;
+      --bg-card:  #130917;
+      --bg-card2: #180d1f;
+      --bg-glass: rgba(255,255,255,0.04);
+
+      --text-primary:   #f5eef8;
+      --text-secondary: #c9aed8;
+      --text-muted:     #7e6490;
+
+      --border:      rgba(247,45,110,0.18);
+      --border-soft: rgba(255,255,255,0.07);
+
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+      --font-display: 'Playfair Display', serif;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+
+      --shadow-card: 0 4px 32px rgba(247,45,110,0.10), 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: radial-gradient(circle at top left, rgba(247,45,110,0.12), transparent 40%),
+                  radial-gradient(circle at bottom right, rgba(180,40,240,0.10), transparent 40%),
+                  var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(247,45,110,0.10), transparent 70%);
+      border-radius: 50%;
+      animation: float 18s ease-in-out infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -30%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%);
+      border-radius: 50%;
+      animation: float 22s ease-in-out infinite reverse;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translate(0,0); }
+      50% { transform: translate(40px,-60px); }
+    }
+
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      padding: 0 36px;
+      background: rgba(13,6,16,0.82);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      border-bottom: 1px solid var(--border-soft);
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+      color: var(--text-primary);
+      background: none;
+      -webkit-text-fill-color: unset;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--text-primary);
+    }
+
+    .brand-tagline {
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    #server-status {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-teal  { background: rgba(20,210,160,0.12);  color: #14d2a0; border: 1px solid rgba(20,210,160,0.25); }
+    .badge-azure { background: rgba(77,158,255,0.12);  color: #4D9EFF; border: 1px solid rgba(77,158,255,0.25); }
+    .badge-gold  { background: rgba(255,179,71,0.12);  color: #FFB347; border: 1px solid rgba(255,179,71,0.25); }
+    .badge-violet{ background: rgba(139,92,246,0.12);  color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+    .badge-rose  { background: rgba(255,95,126,0.12);  color: #ff5f7e; border: 1px solid rgba(255,95,126,0.25); }
+
+    .dark-toggle {
+      background: none;
+      border: 1px solid var(--border-soft);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
+      margin-left: 4px;
+    }
+
+    .dark-toggle:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .verdict-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 70px rgba(247,45,110,0.15), var(--shadow-card);
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+
+    .verdict-hero:hover {
+      transform: translateY(-4px);
+    }
+
+    .verdict-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.verdict-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(247,45,110,0.25), transparent 70%);
+  opacity: 0.6;
+  z-index: 0;
+}
+
+.verdict-hero > * {
+  position: relative;
+  z-index: 1;
+}
+.verdict-hero {
+  max-width: 560px;
+  margin: 0 auto 28px auto;
+  padding: 28px 24px !important;
+  text-align: center;
+}
+
+.verdict-icon {
+  display: block;
+  font-size: 2.6rem !important;
+  line-height: 1;
+  margin: 0 auto 8px auto;
+}
+
+.verdict-label {
+  font-size: 1.6rem !important;
+  margin-bottom: 6px;
+}
+
+.verdict-sub {
+  font-size: 0.82rem !important;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.model-badges {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.model-badges .badge {
+  font-size: 0.68rem;
+  padding: 3px 10px;
+}
+
+    .verdict-label {
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: var(--font-display);
+    }
+
+    .verdict-icon {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      color: var(--text-primary);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 16px 40px rgba(247,45,110,0.2);
+      border-color: var(--border);
+    }
+
+    .kpi-label {
+      color: var(--text-secondary);
+    }
+
+    .kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.08), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.kpi-card:hover::after {
+  opacity: 1;
+}
+
+    .results-grid {
+      gap: 24px;
+}
+
+.result-card {
+  padding: 22px;
+}
+    .result-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      color: var(--text-primary);
+      backdrop-filter: blur(10px);
+    }
+
+    .result-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+      border-color: var(--border);
+    }
+
+    .rc-title {
+      color: var(--text-primary);
+    }
+
+    .rc-sub {
+      color: var(--text-muted);
+    }
+
+    .result-card {
+  transition: all 0.35s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 20px 60px rgba(247,45,110,0.18),
+    0 0 0 1px rgba(255,255,255,0.04);
+}
+
+    .progress-fill {
+      transition: width 1.2s ease-in-out;
+    }
+
+    .progress-track {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .abnormal-item {
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .abnormal-name {
+      color: var(--text-secondary);
+    }
+
+    .abnormal-normal {
+      color: var(--text-muted);
+    }
+
+    .rec-box {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-soft);
+      color: var(--text-primary);
+    }
+
+    .rec-title {
+      color: var(--text-primary);
+    }
+
+    .download-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: 0 14px 45px rgba(247,45,110,0.12);
+    }
+
+    .download-section h3 {
+      color: var(--text-primary);
+    }
+
+    .download-section p,
+    .download-section-checklist span {
+      color: var(--text-secondary);
+    }
+
+    .download-cta-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.download-cta-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.download-cta-btn:hover::after {
+  left: 100%;
+}
+    .download-cta-btn,
+    .btn-primary {
+      background: var(--rose);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(247,45,110,0.35);
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .download-cta-btn:hover,
+    .btn-primary:hover {
+      background: var(--pink-600);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(247,45,110,0.48);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.15);
+      color: var(--text-primary);
+    }
+
+    .action-bar {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .demo-banner {
+      background: rgba(247,45,110,0.08);
+      border: 1px solid var(--border);
+      color: var(--rose-soft);
+    }
+
+    .gradcam-caption {
+      color: var(--text-muted);
+    }
+
+    .gradcam-ai-note {
+      color: var(--text-muted);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-soft);
+    }
+    .gradcam-item img {
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+.gradcam-item img:hover {
+  transform: scale(1.04);
+}
+
+    .gauge-pct {
+      color: var(--text-primary);
+    }
+
+    .gauge-pct-label {
+      color: var(--text-muted);
+    }
+
+    .footer {
+      margin-top: 60px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-brand,
+    .footer-copy,
+    .footer-disclaimer {
+      color: var(--text-muted);
+    }
+
+    .footer-link {
+      color: var(--text-muted);
+    }
+
+    .footer-link:hover {
+      color: var(--rose);
+    }
+  </style>
+<style>
+
+#polycare-pdf-root {
+  --pdf-navy:      #0a1628;
+  --pdf-navy-mid:  #132240;
+  --pdf-teal:      #00a896;
+  --pdf-teal-lt:   #00c9b1;
+  --pdf-teal-pale: #e8f8f6;
+  --pdf-rose:      #c8184e;
+  --pdf-rose-pale: #fff0f4;
+  --pdf-rose-mid:  rgba(200,24,78,0.12);
+  --pdf-blue:      #1a56db;
+  --pdf-blue-pale: #eff6ff;
+  --pdf-amber:     #b45309;
+  --pdf-amber-pale:#fffbeb;
+  --pdf-green:     #065f46;
+  --pdf-green-pale:#ecfdf5;
+  --pdf-text:      #1e2a3b;
+  --pdf-muted:     #64748b;
+  --pdf-rule:      #cbd5e1;
+  --pdf-bg-alt:    #f8fafc;
+  --pdf-border:    #e2e8f0;
+  --pdf-white:     #ffffff;
+  --pdf-radius:    6px;
+  --pdf-px:        32px;
+}
+
+#polycare-pdf-root,
+#polycare-pdf-root * {
+  box-sizing: border-box;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+#polycare-pdf-root .pdf-page {
+  width: 794px;
+  min-height: 1123px;
+  background: var(--pdf-white);
+  color: var(--pdf-text);
+  padding: 0 0 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+  overflow: hidden;
+  border: 1px solid var(--pdf-border);
+  margin-bottom: 2px;
+}
+
+#polycare-pdf-root .pdf-header {
+  background: var(--pdf-navy);
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+
+#polycare-pdf-root .pdf-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--pdf-teal), var(--pdf-teal-lt), var(--pdf-teal));
+}
+
+#polycare-pdf-root .pdf-header-left {
+  padding: 14px 24px 12px var(--pdf-px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#polycare-pdf-root .pdf-brand {
+  font-family: 'Arial', 'Helvetica Neue', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--pdf-white);
+  line-height: 1;
+}
+
+#polycare-pdf-root .pdf-brand span {
+  color: var(--pdf-teal-lt);
+}
+
+#polycare-pdf-root .pdf-brand-sub {
+  font-family: 'Arial', sans-serif;
+  font-size: 7.5px;
+  letter-spacing: 0.14em;
+  color: #7ab8b0;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+#polycare-pdf-root .pdf-header-right {
+  background: rgba(0,0,0,0.25);
+  padding: 14px 24px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  min-width: 180px;
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+#polycare-pdf-root .pdf-header-right span {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  color: #a0c4c0;
+  letter-spacing: 0.06em;
+  display: block;
+}
+
+#polycare-pdf-root .pdf-header-rule {
+  height: 2px;
+  background: linear-gradient(90deg, var(--pdf-teal) 0%, var(--pdf-teal-lt) 60%, transparent 100%);
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-page > *:not(.pdf-header):not(.pdf-header-rule):not(.pdf-footer):not(.pdf-watermark) {
+  padding-left: var(--pdf-px);
+  padding-right: var(--pdf-px);
+}
+
+#polycare-pdf-root .pdf-title-block {
+  padding-top: 18px !important;
+  padding-bottom: 0 !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--pdf-rule);
+  padding-bottom: 12px !important;
+  margin-bottom: 16px;
+}
+
+#polycare-pdf-root .pdf-page-title {
+  font-family: 'Georgia', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--pdf-navy);
+  letter-spacing: 0.01em;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+#polycare-pdf-root .pdf-page-subtitle {
+  font-family: 'Arial', sans-serif;
+  font-size: 8.5px;
+  color: var(--pdf-muted);
+  margin-top: 3px;
+  margin-bottom: 0;
+  padding: 0;
+  letter-spacing: 0.02em;
+}
+
+#polycare-pdf-root .pdf-confidential-badge {
+  font-family: 'Arial', sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pdf-rose);
+  border: 1.5px solid var(--pdf-rose);
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-meta-strip {
+  display: flex;
+  gap: 0;
+  background: var(--pdf-navy);
+  border-radius: var(--pdf-radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+#polycare-pdf-root .pdf-meta-cell {
+  flex: 1;
+  padding: 10px 16px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+#polycare-pdf-root .pdf-meta-cell:last-child {
+  border-right: none;
+}
+
+#polycare-pdf-root .pdf-meta-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 6.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7ab8b0;
+  margin-bottom: 4px;
+}
+
+#polycare-pdf-root .pdf-meta-val {
+  font-family: 'Arial', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--pdf-white);
+  letter-spacing: 0.01em;
+}
+
+#polycare-pdf-root .pdf-verdict-banner {
+  margin-bottom: 16px;
+  border-radius: var(--pdf-radius);
+  overflow: hidden;
+  border: 1.5px solid;
+}
+
+#polycare-pdf-root .pdf-verdict-banner.pcos-positive {
+  background: var(--pdf-rose-pale);
+  border-color: var(--pdf-rose);
+}
+
+#polycare-pdf-root .pdf-verdict-banner.pcos-negative {
+  background: var(--pdf-green-pale);
+  border-color: #059669;
+}
+
+#polycare-pdf-root .pdf-verdict-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+#polycare-pdf-root .pdf-verdict-icon-col {
+  width: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  font-size: 22px;
+}
+
+#polycare-pdf-root .pdf-verdict-banner.pcos-positive .pdf-verdict-icon-col {
+  background: var(--pdf-rose);
+}
+
+#polycare-pdf-root .pdf-verdict-banner.pcos-negative .pdf-verdict-icon-col {
+  background: #059669;
+}
+
+#polycare-pdf-root .pdf-verdict-content {
+  flex: 1;
+  padding: 12px 16px;
+}
+
+#polycare-pdf-root .pdf-verdict-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+#polycare-pdf-root .pdf-verdict-banner.pcos-positive .pdf-verdict-label {
+  color: var(--pdf-rose);
+}
+
+#polycare-pdf-root .pdf-verdict-banner.pcos-negative .pdf-verdict-label {
+  color: var(--pdf-green);
+}
+
+#polycare-pdf-root .pdf-verdict-sub {
+  font-family: 'Arial', sans-serif;
+  font-size: 8.5px;
+  color: var(--pdf-text);
+  line-height: 1.6;
+}
+
+#polycare-pdf-root .pdf-verdict-sub strong {
+  font-weight: 700;
+  color: var(--pdf-navy);
+}
+
+#polycare-pdf-root .pdf-verdict-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 20px 12px 0;
+  min-width: 140px;
+  border-left: 1px solid var(--pdf-border);
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-vstat {
+  font-family: 'Arial', sans-serif;
+  font-size: 7.5px;
+  color: var(--pdf-muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#polycare-pdf-root .pdf-vstat strong {
+  color: var(--pdf-navy);
+  font-weight: 700;
+}
+
+#polycare-pdf-root .pdf-section-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pdf-teal);
+  border-bottom: 1.5px solid var(--pdf-teal);
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#polycare-pdf-root .pdf-section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  background: var(--pdf-teal);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-two-col {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+#polycare-pdf-root .pdf-col {
+  flex: 1;
+  min-width: 0;
+  background: var(--pdf-bg-alt);
+  border: 1px solid var(--pdf-border);
+  border-radius: var(--pdf-radius);
+  padding: 12px 14px;
+}
+
+#polycare-pdf-root .pdf-col .pdf-section-title {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+#polycare-pdf-root .pdf-model-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#polycare-pdf-root .pdf-model-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 8.5px;
+}
+
+#polycare-pdf-root .pdf-model-name {
+  width: 96px;
+  flex-shrink: 0;
+  font-family: 'Arial', sans-serif;
+  color: var(--pdf-text);
+  font-weight: 600;
+}
+
+#polycare-pdf-root .pdf-bar-wrap {
+  flex: 1;
+  height: 7px;
+  background: #dde3eb;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+#polycare-pdf-root .pdf-bar {
+  height: 100%;
+  border-radius: 100px;
+}
+
+#polycare-pdf-root .pdf-bar-azure { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+#polycare-pdf-root .pdf-bar-gold  { background: linear-gradient(90deg, #d97706, #fbbf24); }
+#polycare-pdf-root .pdf-bar-rose  { background: linear-gradient(90deg, var(--pdf-rose), #f472b6); }
+#polycare-pdf-root .pdf-bar-teal  { background: linear-gradient(90deg, var(--pdf-teal), var(--pdf-teal-lt)); }
+
+#polycare-pdf-root .pdf-model-val {
+  width: 36px;
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 8.5px;
+  color: var(--pdf-navy);
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-model-fused {
+  padding-top: 6px;
+  border-top: 1px dashed var(--pdf-rule);
+  margin-top: 2px;
+}
+
+#polycare-pdf-root .pdf-model-fused .pdf-model-name,
+#polycare-pdf-root .pdf-model-fused .pdf-model-val {
+  font-size: 9.5px;
+  color: var(--pdf-rose);
+}
+
+#polycare-pdf-root .pdf-kv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5px;
+}
+
+#polycare-pdf-root .pdf-kv-table tr {
+  border-bottom: 1px solid var(--pdf-border);
+}
+
+#polycare-pdf-root .pdf-kv-table tr:last-child {
+  border-bottom: none;
+}
+
+#polycare-pdf-root .pdf-kv-key,
+#polycare-pdf-root td.pdf-kv-key {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+  color: var(--pdf-muted);
+  padding: 5px 8px 5px 0;
+  width: 42%;
+  vertical-align: top;
+}
+
+#polycare-pdf-root .pdf-kv-val,
+#polycare-pdf-root td.pdf-kv-val {
+  font-family: 'Arial', sans-serif;
+  color: var(--pdf-text);
+  padding: 5px 0;
+  font-weight: 600;
+}
+
+#polycare-pdf-root .pdf-lab-table {
+  border-collapse: collapse;
+  font-size: 8.5px;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  border: 1px solid var(--pdf-border);
+  border-radius: var(--pdf-radius);
+  overflow: hidden;
+}
+
+#polycare-pdf-root .pdf-lab-table thead tr {
+  background: var(--pdf-navy);
+}
+
+#polycare-pdf-root .pdf-lab-table th {
+  font-family: 'Arial', sans-serif;
+  color: var(--pdf-teal-lt);
+  font-weight: 700;
+  padding: 7px 12px;
+  text-align: left;
+  font-size: 7.5px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+#polycare-pdf-root .pdf-lab-table tbody tr {
+  border-bottom: 1px solid var(--pdf-border);
+}
+
+#polycare-pdf-root .pdf-lab-table tbody tr:nth-child(even) td {
+  background: var(--pdf-bg-alt);
+}
+
+#polycare-pdf-root .pdf-lab-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+#polycare-pdf-root .pdf-lab-table td {
+  font-family: 'Arial', sans-serif;
+  padding: 6px 12px;
+  color: var(--pdf-text);
+  vertical-align: middle;
+}
+
+#polycare-pdf-root .pdf-biomarkers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+#polycare-pdf-root .pdf-bio-card {
+  width: calc(50% - 4px);
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-radius: var(--pdf-radius);
+  border: 1px solid;
+  overflow: hidden;
+  font-size: 8.5px;
+}
+
+#polycare-pdf-root .pdf-bio-card.flag-high {
+  background: var(--pdf-rose-pale);
+  border-color: rgba(200,24,78,0.35);
+}
+
+#polycare-pdf-root .pdf-bio-card.flag-low {
+  background: var(--pdf-blue-pale);
+  border-color: rgba(26,86,219,0.3);
+}
+
+#polycare-pdf-root .pdf-bio-accent {
+  width: 4px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+#polycare-pdf-root .flag-high .pdf-bio-accent { background: var(--pdf-rose); }
+#polycare-pdf-root .flag-low  .pdf-bio-accent { background: var(--pdf-blue); }
+
+#polycare-pdf-root .pdf-bio-body {
+  flex: 1;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#polycare-pdf-root .pdf-bio-info { flex: 1; }
+
+#polycare-pdf-root .pdf-bio-name {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+  color: var(--pdf-navy);
+  display: block;
+  margin-bottom: 2px;
+}
+
+#polycare-pdf-root .pdf-bio-range {
+  font-family: 'Arial', sans-serif;
+  color: var(--pdf-muted);
+  font-size: 7px;
+  display: block;
+}
+
+#polycare-pdf-root .pdf-bio-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-bio-val {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  display: block;
+  line-height: 1;
+}
+
+#polycare-pdf-root .flag-high .pdf-bio-val { color: var(--pdf-rose); }
+#polycare-pdf-root .flag-low  .pdf-bio-val { color: var(--pdf-blue); }
+
+#polycare-pdf-root .pdf-bio-badge {
+  font-family: 'Arial', sans-serif;
+  font-size: 6.5px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-top: 3px;
+}
+
+#polycare-pdf-root .flag-high .pdf-bio-badge {
+  background: rgba(200,24,78,0.12);
+  color: var(--pdf-rose);
+  border: 1px solid rgba(200,24,78,0.25);
+}
+
+#polycare-pdf-root .flag-low .pdf-bio-badge {
+  background: rgba(26,86,219,0.10);
+  color: var(--pdf-blue);
+  border: 1px solid rgba(26,86,219,0.22);
+}
+
+#polycare-pdf-root .pdf-symptoms-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+#polycare-pdf-root .pdf-sym-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-family: 'Arial', sans-serif;
+  font-size: 7.5px;
+}
+
+#polycare-pdf-root .pdf-sym-chip.yes {
+  background: var(--pdf-rose-pale);
+  border: 1px solid rgba(200,24,78,0.3);
+  color: #7f0c2e;
+}
+
+#polycare-pdf-root .pdf-sym-chip.no {
+  background: var(--pdf-bg-alt);
+  border: 1px solid var(--pdf-border);
+  color: var(--pdf-muted);
+}
+
+#polycare-pdf-root .pdf-sym-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-sym-chip.yes .pdf-sym-dot { background: var(--pdf-rose); }
+#polycare-pdf-root .pdf-sym-chip.no  .pdf-sym-dot { background: #a0aec0; }
+
+#polycare-pdf-root .pdf-rec-box {
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  border-radius: var(--pdf-radius);
+  background: #fff8f0;
+  border-left: 4px solid #d97706;
+  border-top: 1px solid #fed7aa;
+  border-right: 1px solid #fed7aa;
+  border-bottom: 1px solid #fed7aa;
+  font-family: 'Arial', sans-serif;
+  font-size: 8.5px;
+  color: var(--pdf-text);
+  line-height: 1.7;
+}
+
+#polycare-pdf-root .pdf-shap-legend {
+  font-family: 'Arial', sans-serif;
+  font-size: 7.5px;
+  color: var(--pdf-muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#polycare-pdf-root .pdf-shap-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+
+#polycare-pdf-root .pdf-shap-dot-red   { background: var(--pdf-rose); }
+#polycare-pdf-root .pdf-shap-dot-green { background: var(--pdf-teal); }
+
+#polycare-pdf-root .pdf-shap-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#polycare-pdf-root .pdf-shap-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 7.5px;
+}
+
+#polycare-pdf-root .pdf-shap-label {
+  font-family: 'Arial', sans-serif;
+  width: 135px;
+  flex-shrink: 0;
+  text-align: right;
+  color: var(--pdf-text);
+}
+
+#polycare-pdf-root .pdf-shap-track {
+  flex: 1;
+  height: 7px;
+  background: #dde3eb;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+#polycare-pdf-root .pdf-shap-fill {
+  height: 100%;
+  border-radius: 100px;
+}
+
+#polycare-pdf-root .pdf-shap-fill.up   { background: linear-gradient(90deg, var(--pdf-rose), #f472b6); }
+#polycare-pdf-root .pdf-shap-fill.down { background: linear-gradient(90deg, var(--pdf-teal), var(--pdf-teal-lt)); }
+
+#polycare-pdf-root .pdf-shap-val {
+  font-family: 'Courier New', monospace;
+  width: 52px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 7.5px;
+  flex-shrink: 0;
+}
+
+#polycare-pdf-root .pdf-shap-val.up   { color: var(--pdf-rose); }
+#polycare-pdf-root .pdf-shap-val.down { color: var(--pdf-green); }
+
+#polycare-pdf-root .pdf-sig-row {
+  display: flex;
+  gap: 0;
+  margin-top: auto;
+  border-top: 1px solid var(--pdf-rule);
+  background: var(--pdf-bg-alt);
+}
+
+#polycare-pdf-root .pdf-sig-cell {
+  flex: 1;
+  padding: 14px var(--pdf-px);
+  border-right: 1px solid var(--pdf-border);
+}
+
+#polycare-pdf-root .pdf-sig-cell:last-child {
+  border-right: none;
+}
+
+#polycare-pdf-root .pdf-sig-line {
+  border-bottom: 1.5px solid #94a3b8;
+  width: 160px;
+  margin-bottom: 6px;
+}
+
+#polycare-pdf-root .pdf-sig-name {
+  font-family: 'Arial', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--pdf-navy);
+}
+
+#polycare-pdf-root .pdf-sig-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 7px;
+  color: var(--pdf-muted);
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+
+#polycare-pdf-root .pdf-disclaimer {
+  margin: 12px 0 0;
+  padding: 10px 16px;
+  background: var(--pdf-amber-pale);
+  border: 1px solid #fcd34d;
+  border-left: 4px solid #d97706;
+  border-radius: var(--pdf-radius);
+  font-family: 'Arial', sans-serif;
+  font-size: 7px;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+#polycare-pdf-root .pdf-cnn-finding {
+  margin-bottom: 10px;
+  border-radius: var(--pdf-radius);
+  overflow: hidden;
+  border: 1px solid var(--pdf-border);
+}
+
+#polycare-pdf-root .pdf-cnn-finding-header {
+  background: var(--pdf-navy);
+  padding: 7px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#polycare-pdf-root .pdf-cnn-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--pdf-white);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#polycare-pdf-root .pdf-cnn-body {
+  background: var(--pdf-bg-alt);
+  padding: 8px 14px;
+}
+
+#polycare-pdf-root .pdf-cnn-sub {
+  font-family: 'Arial', sans-serif;
+  font-size: 8px;
+  color: var(--pdf-text);
+  font-weight: 600;
+}
+
+#polycare-pdf-root .pdf-img-pair {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+#polycare-pdf-root .pdf-img-cell {
+  flex: 1;
+  text-align: center;
+  background: var(--pdf-bg-alt);
+  border: 1px solid var(--pdf-border);
+  border-radius: var(--pdf-radius);
+  overflow: hidden;
+}
+
+#polycare-pdf-root .pdf-img-cell-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pdf-white);
+  background: var(--pdf-navy);
+  padding: 5px 10px;
+  text-align: left;
+}
+
+#polycare-pdf-root .pdf-usg-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  background: #0d1830;
+}
+
+#polycare-pdf-root .pdf-img-caption {
+  font-family: 'Arial', sans-serif;
+  font-size: 7.5px;
+  color: var(--pdf-muted);
+  padding: 6px 10px;
+  text-align: left;
+  line-height: 1.5;
+  border-top: 1px solid var(--pdf-border);
+}
+
+#polycare-pdf-root .pdf-no-image {
+  padding: 18px;
+  background: var(--pdf-bg-alt);
+  border: 1.5px dashed #94a3b8;
+  border-radius: var(--pdf-radius);
+  font-family: 'Arial', sans-serif;
+  font-size: 8.5px;
+  color: var(--pdf-muted);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#polycare-pdf-root .pdf-impression-list {
+  padding: 0;
+  margin: 0 0 12px 0;
+  list-style: none;
+  counter-reset: impression-counter;
+}
+
+#polycare-pdf-root .pdf-impression-list li {
+  font-family: 'Arial', sans-serif;
+  font-size: 9px;
+  color: var(--pdf-text);
+  line-height: 1.7;
+  margin-bottom: 6px;
+  padding: 8px 12px 8px 44px;
+  background: var(--pdf-bg-alt);
+  border: 1px solid var(--pdf-border);
+  border-radius: var(--pdf-radius);
+  position: relative;
+  counter-increment: impression-counter;
+}
+
+#polycare-pdf-root .pdf-impression-list li::before {
+  content: counter(impression-counter);
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background: var(--pdf-teal);
+  color: var(--pdf-white);
+  border-radius: 50%;
+  font-family: 'Arial', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+#polycare-pdf-root .pdf-footer {
+  flex-shrink: 0;
+  padding: 8px var(--pdf-px);
+  border-top: 2px solid var(--pdf-navy);
+  font-family: 'Arial', sans-serif;
+  font-size: 7px;
+  color: var(--pdf-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--pdf-bg-alt);
+  letter-spacing: 0.03em;
+}
+
+#polycare-pdf-root .pdf-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#polycare-pdf-root .pdf-footer-brand {
+  font-weight: 800;
+  color: var(--pdf-navy);
+  letter-spacing: 0.08em;
+}
+
+#polycare-pdf-root .pdf-footer-sep {
+  color: var(--pdf-rule);
+}
+
+#polycare-pdf-root .pdf-page-num {
+  font-family: 'Courier New', monospace;
+  font-size: 7.5px;
+  font-weight: 700;
+  color: var(--pdf-navy);
+  background: var(--pdf-teal-pale);
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid rgba(0,168,150,0.25);
+}
+
+#polycare-pdf-root .status-high {
+  color: var(--pdf-rose);
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+  background: var(--pdf-rose-pale);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 7.5px;
+  display: inline-block;
+}
+
+#polycare-pdf-root .status-low {
+  color: var(--pdf-blue);
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+  background: var(--pdf-blue-pale);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 7.5px;
+  display: inline-block;
+}
+
+#polycare-pdf-root .status-ok {
+  color: var(--pdf-green);
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  background: var(--pdf-green-pale);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 7.5px;
+  display: inline-block;
+}
+</style>
+ 
+
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <a href="index.html" class="nav-logo">
+    <img src="assets/images/polycarelogo.png" alt="POLYCARE Logo" style="height:38px;width:auto;object-fit:contain;">
+    <div class="nav-brand-text">
+      <span class="nav-brand-name">POLY<span>CARE</span></span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="about.html" class="nav-link">About</a>
+    <span id="server-status" class="badge badge-teal">● Live</span>
+    <button class="dark-toggle" title="Toggle theme">☀️</button>
+  </div>
+</nav>
+
+<main class="result-page" id="result-container">
+  <div class="container">
+
+    <div class="demo-banner" id="demo-banner">
+      ⚡ <strong>Demo Mode Active</strong> — Results are simulated. Connect Flask backend for live predictions.
+    </div>
+
+    <section class="verdict-hero">
+      <div class="verdict-aura" id="verdict-aura"></div>
+      <span class="verdict-icon" id="verdict-icon">⏳</span>
+      <div class="verdict-label" id="verdict-label">Analysing…</div>
+      <div class="verdict-sub"   id="verdict-sub">Processing multimodal AI pipeline</div>
+      <div class="model-badges">
+        <span class="badge badge-azure">🌲 Random Forest</span>
+        <span class="badge badge-gold">⚡ XGBoost</span>
+        <span class="badge badge-teal">🖼️ CNN Fusion</span>
+        <span class="badge badge-violet">🔗 Late Fusion</span>
+      </div>
+    </section>
+
+    <div class="kpi-strip">
+      <div class="kpi-card" style="--kpi-color:var(--teal)">
+        <div class="kpi-value" id="confidence-value">—</div>
+        <div class="kpi-label">Confidence Score</div>
+        <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);margin-top:6px">%</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:var(--gold)">
+        <div class="kpi-value" id="risk-label">—</div>
+        <div class="kpi-label">Risk Level</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">Stratified</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:var(--azure)">
+        <div class="kpi-value" id="modality-value">—</div>
+        <div class="kpi-label">Analysis Mode</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">Data type</div>
+      </div>
+    </div>
+
+    <div class="results-grid">
+
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-icon" style="background:var(--teal-subtle);border:1px solid var(--teal-border)">📊</div>
+          <div>
+            <div class="rc-title">Confidence Gauge</div>
+            <div class="rc-sub">Overall prediction certainty</div>
+          </div>
+        </div>
+        <div class="gauge-wrap">
+          <canvas id="confidence-gauge" width="190" height="190"></canvas>
+          <div class="gauge-center">
+            <span class="gauge-pct" id="gauge-label">—</span>
+            <span class="gauge-pct-label">Confidence</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-icon" style="background:var(--azure-subtle);border:1px solid rgba(77,158,255,0.2)">🤖</div>
+          <div>
+            <div class="rc-title">Model Comparison</div>
+            <div class="rc-sub">PCOS probability per model</div>
+          </div>
+        </div>
+        <canvas id="model-comparison-chart" height="170"></canvas>
+      </div>
+
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-icon" style="background:var(--gold-subtle);border:1px solid rgba(255,179,71,0.2)">🔗</div>
+          <div>
+            <div class="rc-title">Fusion Breakdown</div>
+            <div class="rc-sub">Contribution from each modality</div>
+          </div>
+        </div>
+        <div id="fusion-breakdown">
+          <p style="font-size:0.84rem;color:var(--text-muted)">Loading fusion data…</p>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-icon" style="background:var(--rose-subtle);border:1px solid rgba(255,95,126,0.2)">📋</div>
+          <div>
+            <div class="rc-title">Clinical Recommendation</div>
+            <div class="rc-sub">Risk-stratified guidance</div>
+          </div>
+        </div>
+        <div class="rec-box" id="rec-box">
+          <div class="rec-title" id="rec-title">Recommendation</div>
+          <p id="recommendation-text" style="font-size:0.88rem;line-height:1.7;margin:0"></p>
+        </div>
+      </div>
+
+      <div class="result-card rc-full">
+        <div class="rc-header" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div class="rc-icon" style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.18)">
+              📊
+            </div>
+            <div>
+              <div class="rc-title">SHAP Feature Importance</div>
+              <div class="rc-sub">Top clinical features driving the prediction</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;font-size:0.78rem;align-items:center;flex-wrap:wrap">
+            <span style="display:flex;align-items:center;gap:5px">
+              <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(255,95,126,0.7)"></span>
+              Increases PCOS risk
+            </span>
+            <span style="display:flex;align-items:center;gap:5px">
+              <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(0,212,170,0.7)"></span>
+              Decreases PCOS risk
+            </span>
+          </div>
+        </div>
+        <div class="shap-chart-wrap">
+          <canvas id="shap-chart" height="220"></canvas>
+        </div>
+        <div id="shap-unavailable" style="display:none;text-align:center;padding:40px 20px">
+          <div style="font-size:2.5rem;margin-bottom:12px">📊</div>
+          <p style="font-size:0.88rem;color:var(--text-muted)">
+            SHAP explainability requires the Flask backend with trained models.<br>
+            <span style="font-size:0.78rem">Run the backend to enable this feature.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="rc-header">
+          <div class="rc-icon" style="background:var(--rose-subtle);border:1px solid rgba(255,95,126,0.2)">⚠️</div>
+          <div>
+            <div class="rc-title">Abnormal Biomarkers</div>
+            <div class="rc-sub">Values outside normal clinical ranges</div>
+          </div>
+        </div>
+        <div id="abnormal-features">
+          <p style="font-size:0.84rem;color:var(--text-muted)">Loading biomarker data…</p>
+        </div>
+      </div>
+
+      <div class="result-card" id="gradcam-wrap">
+        <div class="rc-header">
+          <div class="rc-icon" style="background:rgba(255,95,126,0.08);border:1px solid rgba(255,95,126,0.18)">
+            🔥
+          </div>
+          <div>
+            <div class="rc-title">🔥 Grad-CAM Heatmap</div>
+            <div class="rc-sub">CNN attention map — red/yellow = high-influence regions</div>
+          </div>
+        </div>
+        <div class="gradcam-pair">
+          <div class="gradcam-item">
+            <img id="original-img" src="" alt="Original Ultrasound">
+            <p class="gradcam-caption">Original Ultrasound Scan</p>
+          </div>
+          <div class="gradcam-item">
+            <img id="gradcam-img" src="" alt="Grad-CAM Heatmap">
+            <p class="gradcam-caption">🧠 Grad-CAM Attention Map</p>
+          </div>
+        </div>
+        <div class="gradcam-ai-note">
+          🔴 Red / Orange = High CNN attention &nbsp;·&nbsp;
+          🟡 Yellow = Moderate &nbsp;·&nbsp;
+          🟢 Blue / Green = Low attention regions.<br>
+          Highlighted areas indicate regions the model weighted most heavily in its decision.
+        </div>
+      </div>
+
+    </div><!-- /results-grid -->
+
+    <div class="download-section" id="download-section">
+      <div class="download-section-text">
+        <h3>📋 Clinical Report Ready</h3>
+        <p>Download a full, structured PDF clinical report — includes prediction verdict,
+           confidence score, abnormal biomarker highlights, SHAP feature importance,
+           and personalised clinical recommendations.</p>
+        <div class="download-section-checklist">
+          <span>Prediction verdict &amp; confidence score</span>
+          <span>Abnormal biomarker highlights</span>
+          <span>SHAP feature importance chart</span>
+          <span>Grad-CAM ultrasound heatmap (if image provided)</span>
+          <span>Risk-stratified clinical recommendations</span>
+        </div>
+        <button class="download-cta-btn" onclick="POLYCARE.downloadReport()">
+          📥 Download Clinical Report
+        </button>
+      </div>
+      <div class="download-section-visual">📄</div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-ghost" onclick="window.print()">🖨️ Print</button>
+    </div>
+
+    <div style="margin-top:24px;padding:16px 20px;background:rgba(255,179,71,0.06);border:1px solid rgba(255,179,71,0.15);border-radius:var(--r-md)">
+      <p style="font-size:0.8rem;color:#FFB347;margin:0;line-height:1.7">
+        ⚠️ <strong>Disclaimer:</strong> POLYCARE is an AI-assisted screening tool.
+        Results must be interpreted by a qualified medical professional. This is not a
+        substitute for clinical diagnosis. Always consult a gynaecologist.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="script.js"></script>
+<script src="script_additions.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const data = JSON.parse(sessionStorage.getItem('polycare_result') || 'null');
+
+  if (!data) {
+    document.getElementById('result-container').innerHTML = `
+      <div class="container">
+        <div class="no-result-state">
+          <span class="no-result-icon">🔍</span>
+          <h2>No Result Found</h2>
+          <p style="margin:12px 0 28px;color:var(--text-secondary)">
+            Please complete the PCOS analysis form to see your results here.
+          </p>
+          <a href="predict.html" class="btn btn-primary btn-lg">🔬 Run Diagnosis</a>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const isPcos = data.prediction === 1;
+  const conf   = data.confidence_pct || 0;
+  const risk   = data.risk || {};
+
+  if (data.demo_mode) {
+    const b = document.getElementById('demo-banner');
+    if (b) b.style.display = 'flex';
+  }
+
+  const aura = document.getElementById('verdict-aura');
+  if (aura) aura.style.background = isPcos ? 'var(--rose)' : 'var(--teal)';
+
+  document.getElementById('verdict-icon').textContent = isPcos ? '⚠️' : '✅';
+
+  const labelEl = document.getElementById('verdict-label');
+  labelEl.textContent = isPcos ? 'PCOS Detected' : 'PCOS Not Detected';
+  labelEl.style.color = isPcos ? 'var(--rose)' : 'var(--teal)';
+
+  document.getElementById('verdict-sub').textContent = isPcos
+    ? 'Multiple PCOS indicators identified in your clinical data. Please consult a specialist.'
+    : 'Clinical indicators are within acceptable ranges. Maintain routine health check-ups.';
+
+  const confEl = document.getElementById('confidence-value');
+  if (confEl) {
+    let t = 0;
+    const timer = setInterval(() => {
+      t += 2;
+      confEl.textContent = Math.min(t, conf).toFixed(1);
+      if (t >= conf) clearInterval(timer);
+    }, 18);
+  }
+
+  /* KPI: gauge center */
+  const gaugeLabel = document.getElementById('gauge-label');
+  if (gaugeLabel) gaugeLabel.textContent = conf.toFixed(1) + '%';
+
+  /* KPI: risk */
+  const riskEl = document.getElementById('risk-label');
+  if (riskEl) {
+    riskEl.textContent  = risk.level || '—';
+    riskEl.style.color  = risk.color || 'var(--gold)';
+  }
+
+  /* KPI: modality */
+  const modVal = document.getElementById('modality-value');
+  if (modVal) {
+    const hasImage = data.fusion?.has_image;
+    modVal.textContent = hasImage ? 'Multimodal' : 'Structured';
+    modVal.style.color = hasImage ? 'var(--azure)' : 'var(--teal)';
+  }
+
+  /* Recommendation */
+  const recBox = document.getElementById('rec-box');
+  if (recBox && isPcos) recBox.classList.add('warning');
+  document.getElementById('rec-title').textContent     = isPcos ? '⚠️ Action Required' : '✅ Looking Good';
+  document.getElementById('recommendation-text').textContent = risk.recommendation || '';
+
+  /* Confidence Gauge */
+  const gaugeCanvas = document.getElementById('confidence-gauge');
+  if (gaugeCanvas) {
+    const color = isPcos
+      ? (conf >= 70 ? '#FF5F7E' : '#FFB347')
+      : '#00D4AA';
+    new Chart(gaugeCanvas, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [conf, 100 - conf],
+          backgroundColor: [color, 'rgba(255,255,255,0.04)'],
+          borderWidth: 0,
+          circumference: 270,
+          rotation: -135,
+        }]
+      },
+      options: {
+        cutout: '80%', responsive: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        animation: { duration: 2000, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  const compCanvas = document.getElementById('model-comparison-chart');
+  if (compCanvas) {
+    const m       = data.models || {};
+    const rfProb  = ((m.random_forest?.probability || 0) * 100).toFixed(1);
+    const xgbProb = ((m.xgboost?.probability || 0) * 100).toFixed(1);
+    new Chart(compCanvas, {
+      type: 'bar',
+      data: {
+        labels: ['Random Forest', 'XGBoost', 'Final Fused'],
+        datasets: [{
+          data: [rfProb, xgbProb, conf],
+          backgroundColor: ['rgba(77,158,255,0.65)', 'rgba(255,179,71,0.65)', 'rgba(236,72,153,0.75)'],
+          borderColor:     ['#4D9EFF','#FFB347','#ec4899'],
+          borderWidth: 1.5,
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => ` ${c.raw}%` } }
+        },
+        scales: {
+          y: { beginAtZero: true, max: 100, ticks: { color: '#7AAAA0', callback: v => v + '%' }, grid: { color: 'rgba(0,212,170,0.05)' } },
+          x: { ticks: { color: '#7AAAA0' }, grid: { display: false } }
+        },
+        animation: { duration: 1400 }
+      }
+    });
+  }
+
+  const shap = data.shap;
+  console.log('[POLYCARE] result.html — data.shap:', shap);
+  const shapCanvas = document.getElementById('shap-chart');
+  if (shapCanvas && shap && shap.success === true && Array.isArray(shap.top_features) && shap.top_features.length > 0) {
+    const top    = shap.top_features.slice(0, 8);
+    const labels = top.map(f => f.feature.replace(/[()]/g, '').replace(/mIU\/mL/, '').trim());
+    const values = top.map(f => f.shap);
+    const colors = values.map(v => v > 0 ? 'rgba(255,95,126,0.75)' : 'rgba(0,212,170,0.75)');
+    new Chart(shapCanvas, {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'SHAP', data: values, backgroundColor: colors, borderRadius: 6 }] },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => ` ${c.raw > 0 ? '+' : ''}${c.raw.toFixed(4)}` } }
+        },
+        scales: {
+          x: { ticks: { color: '#7AAAA0' }, grid: { color: 'rgba(0,212,170,0.05)' } },
+          y: { ticks: { color: '#7AAAA0', font: { size: 11 } }, grid: { display: false } }
+        },
+        animation: { duration: 1100 }
+      }
+    });
+  } else if (shapCanvas) {
+    shapCanvas.style.display = 'none';
+    document.getElementById('shap-unavailable').style.display = 'block';
+  }
+  const abnormals = data.abnormal_features || [];
+  const abnEl = document.getElementById('abnormal-features');
+  if (abnEl) {
+    if (!abnormals.length) {
+      abnEl.innerHTML = '<p style="color:var(--teal);font-size:.88rem;padding:8px 0">✅ All measured biomarkers within normal ranges.</p>';
+    } else {
+
+  const fusionEl = document.getElementById('fusion-breakdown');
+  if (fusionEl && data.fusion) {
+    const f  = data.fusion;
+    const sp = ((f.structured_probability || 0) * 100).toFixed(1);
+    const ip = f.image_probability != null ? ((f.image_probability) * 100).toFixed(1) : null;
+    fusionEl.innerHTML = `
+      <div class="fusion-label">Modality Contributions</div>
+      <div class="fusion-row">
+        <span style="width:110px;flex-shrink:0">Structured Data</span>
+        <div class="progress-track" style="flex:1">
+          <div class="progress-fill" style="width:${sp}%;background:var(--azure)"></div>
+        </div>
+        <span style="font-family:var(--font-mono);color:var(--azure);width:46px;text-align:right;font-size:0.84rem">${sp}%</span>
+      </div>
+      ${ip
+        ? `<div class="fusion-row">
+             <span style="width:110px;flex-shrink:0">Ultrasound CNN</span>
+             <div class="progress-track" style="flex:1">
+               <div class="progress-fill" style="width:${ip}%;background:var(--gold)"></div>
+             </div>
+             <span style="font-family:var(--font-mono);color:var(--gold);width:46px;text-align:right;font-size:0.84rem">${ip}%</span>
+           </div>`
+        : `<div style="font-size:.8rem;color:var(--text-muted);padding:8px 0">No image uploaded — structured data only mode</div>`
+      }
+      <div class="fusion-row" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <span style="width:110px;flex-shrink:0"><strong>Final Fused</strong></span>
+        <div class="progress-track" style="flex:1">
+          <div class="progress-fill" style="width:${conf}%;background:linear-gradient(90deg,#ec4899,#8b5cf6)"></div>
+        </div>
+        <span style="font-family:var(--font-mono);color:var(--teal);width:46px;text-align:right;font-size:0.84rem">${conf}%</span>
+      </div>`;
+  }
+
+  if (data.gradcam_b64) {
+    const wrap = document.getElementById('gradcam-wrap');
+    const img  = document.getElementById('gradcam-img');
+    const orig = document.getElementById('original-img');
+    if (img)  img.src = data.gradcam_b64;
+    if (orig && data.uploaded_image_b64) orig.src = data.uploaded_image_b64;
+    else if (orig) orig.style.display = 'none';
+    if (wrap) wrap.style.display = 'block';
+  }
+
+  if (typeof STATE !== 'undefined') {
+    STATE.lastResult = data;
+  } else {
+    window.STATE = { lastResult: data, darkMode: true, charts: {} };
+  }
+  console.log('[POLYCARE] result.html — full data object stored to STATE:', data);
+  checkHealth && checkHealth();
+});
+</script>
+
+<style>
+#polycare-pdf-root {
+  --p-navy:       #0a1628;
+  --p-teal:       #00a896;
+  --p-teal-lt:    #00c9b1;
+  --p-rose:       #c8184e;
+  --p-rose-pale:  #fff0f4;
+  --p-green:      #065f46;
+  --p-green-pale: #ecfdf5;
+  --p-text:       #1e2a3b;
+  --p-muted:      #64748b;
+  --p-rule:       #e2e8f0;
+  --p-bg-alt:     #f8fafc;
+  --p-white:      #ffffff;
+  --p-px:         28px;
+}
+#polycare-pdf-root,
+#polycare-pdf-root * {
+  box-sizing: border-box;
+  font-family: 'Arial', 'Helvetica Neue', sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+#polycare-pdf-root .p-page {
+  width: 794px;
+  height: 1123px;
+  background: var(--p-white);
+  color: var(--p-text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+#polycare-pdf-root .p-hdr {
+  background: var(--p-navy);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+  position: relative;
+}
+#polycare-pdf-root .p-hdr::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--p-teal), var(--p-teal-lt), var(--p-teal));
+}
+#polycare-pdf-root .p-hdr-left {
+  padding: 12px 20px 10px var(--p-px);
+}
+#polycare-pdf-root .p-brand {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+#polycare-pdf-root .p-brand span { color: var(--p-teal-lt); }
+#polycare-pdf-root .p-brand-sub {
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  color: #7ab8b0;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+#polycare-pdf-root .p-hdr-right {
+  background: rgba(0,0,0,0.22);
+  padding: 12px 20px 10px 20px;
+  border-left: 1px solid rgba(255,255,255,0.06);
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+}
+#polycare-pdf-root .p-hdr-right div {
+  font-size: 8px;
+  color: #a0c4c0;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.05em;
+}
+#polycare-pdf-root .p-hdr-right strong { color: #c8e8e4; }
+#polycare-pdf-root .p-body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px var(--p-px) 0 var(--p-px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#polycare-pdf-root .p-page-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--p-navy);
+  border-bottom: 2px solid var(--p-rule);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-confidential {
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--p-rose);
+  border: 1.5px solid var(--p-rose);
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+#polycare-pdf-root .p-meta {
+  display: flex;
+  background: var(--p-navy);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-meta-cell {
+  flex: 1;
+  padding: 9px 14px;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+#polycare-pdf-root .p-meta-cell:last-child { border-right: none; }
+#polycare-pdf-root .p-meta-lbl {
+  font-size: 6px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7ab8b0;
+  margin-bottom: 3px;
+}
+#polycare-pdf-root .p-meta-val {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+#polycare-pdf-root .p-verdict {
+  display: flex;
+  align-items: stretch;
+  border-radius: 5px;
+  border: 1.5px solid;
+  overflow: hidden;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-verdict.pcos-pos {
+  background: var(--p-rose-pale);
+  border-color: var(--p-rose);
+}
+#polycare-pdf-root .p-verdict.pcos-neg {
+  background: var(--p-green-pale);
+  border-color: #059669;
+}
+#polycare-pdf-root .p-verdict-icon {
+  width: 48px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-verdict.pcos-pos .p-verdict-icon { background: var(--p-rose); }
+#polycare-pdf-root .p-verdict.pcos-neg .p-verdict-icon { background: #059669; }
+#polycare-pdf-root .p-verdict-content {
+  flex: 1;
+  padding: 10px 14px;
+}
+#polycare-pdf-root .p-verdict-label {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+#polycare-pdf-root .p-verdict.pcos-pos .p-verdict-label { color: var(--p-rose); }
+#polycare-pdf-root .p-verdict.pcos-neg .p-verdict-label { color: var(--p-green); }
+#polycare-pdf-root .p-verdict-sub {
+  font-size: 8px;
+  color: var(--p-text);
+  line-height: 1.55;
+}
+#polycare-pdf-root .p-verdict-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 16px;
+  border-left: 1px solid var(--p-rule);
+  gap: 5px;
+  min-width: 150px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-vstat {
+  font-size: 7.5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--p-muted);
+}
+#polycare-pdf-root .p-vstat strong { color: var(--p-navy); font-weight: 700; }
+#polycare-pdf-root .p-sec {
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--p-teal);
+  border-bottom: 1.5px solid var(--p-teal);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-sec::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 9px;
+  background: var(--p-teal);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-cols {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  min-height: 0;
+  align-items: stretch;
+}
+#polycare-pdf-root .p-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#polycare-pdf-root .p-col {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--p-bg-alt);
+  border: 1px solid var(--p-rule);
+  border-radius: 6px;
+  padding: 12px 14px 14px;
+}
+#polycare-pdf-root .p-col-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+#polycare-pdf-root .p-box {
+  background: var(--p-bg-alt);
+  border: 1px solid var(--p-rule);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-kv {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+}
+#polycare-pdf-root .p-kv tr { border-bottom: 1px solid var(--p-rule); }
+#polycare-pdf-root .p-kv tr:last-child { border-bottom: none; }
+#polycare-pdf-root .p-kv td { padding: 12px 8px; white-space: nowrap; }
+#polycare-pdf-root .p-kv .k {
+  width: 1%;
+  color: var(--p-muted);
+  font-weight: 600;
+  padding-right: 18px;
+}
+#polycare-pdf-root .p-kv .v {
+  width: 99%;
+  font-weight: 700;
+  color: var(--p-navy);
+}
+
+#polycare-pdf-root .p-kv-wide {
+  display: block;
+  column-count: 2;
+  column-gap: 32px;
+}
+#polycare-pdf-root .p-kv-wide tbody { display: block; }
+#polycare-pdf-root .p-kv-wide tr {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--p-rule);
+  padding: 12px 4px;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+#polycare-pdf-root .p-kv-wide tr:last-child { border-bottom: none; }
+#polycare-pdf-root .p-kv-wide td {
+  padding: 0 4px;
+  white-space: nowrap;
+}
+#polycare-pdf-root .p-kv-wide .k {
+  flex: 0 0 50%;
+  width: auto;
+  color: var(--p-muted);
+  font-weight: 600;
+  padding-right: 0;
+}
+#polycare-pdf-root .p-kv-wide .v {
+  flex: 1;
+  width: auto;
+  font-weight: 700;
+  color: var(--p-navy);
+}
+#polycare-pdf-root .p-lab {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+  margin-bottom: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+#polycare-pdf-root .p-lab thead tr {
+  background: var(--p-navy);
+  color: #fff;
+}
+#polycare-pdf-root .p-lab thead th {
+  padding: 11px 12px;
+  text-align: left;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+#polycare-pdf-root .p-lab tbody tr { border-bottom: 1px solid var(--p-rule); }
+#polycare-pdf-root .p-lab tbody tr:last-child { border-bottom: none; }
+#polycare-pdf-root .p-lab tbody tr:nth-child(even) { background: var(--p-bg-alt); }
+#polycare-pdf-root .p-lab tbody td { padding: 11px 12px; }
+#polycare-pdf-root .s-ok   { color: #065f46; font-weight: 700; font-size: 9px; }
+#polycare-pdf-root .s-high { color: var(--p-rose); font-weight: 700; font-size: 9px; }
+#polycare-pdf-root .s-low  { color: #1a56db; font-weight: 700; font-size: 9px; }
+#polycare-pdf-root .p-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0;
+}
+#polycare-pdf-root .p-chip {
+  font-size: 7.5px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+#polycare-pdf-root .p-chip.yes {
+  background: rgba(200,24,78,0.10);
+  color: var(--p-rose);
+  border: 1px solid rgba(200,24,78,0.3);
+}
+#polycare-pdf-root .p-chip.no {
+  background: var(--p-bg-alt);
+  color: var(--p-muted);
+  border: 1px solid var(--p-rule);
+}
+#polycare-pdf-root .p-rec {
+  background: var(--p-bg-alt);
+  border: 1px solid var(--p-rule);
+  border-left: 3px solid var(--p-teal);
+  border-radius: 4px;
+  padding: 14px 18px;
+  font-size: 9.5px;
+  line-height: 1.85;
+  color: var(--p-text);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+#polycare-pdf-root .p-usg-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--p-bg-alt);
+  border: 1px solid var(--p-rule);
+  border-radius: 5px;
+  padding: 10px;
+  flex: 1;
+  min-height: 0;
+}
+#polycare-pdf-root .p-usg-wrap img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+#polycare-pdf-root .p-usg-caption {
+  text-align: center;
+  font-size: 7.5px;
+  color: var(--p-muted);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-no-image {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 8.5px;
+  color: var(--p-muted);
+  padding: 20px;
+  font-style: italic;
+  background: var(--p-bg-alt);
+  border: 1px solid var(--p-rule);
+  border-radius: 5px;
+}
+#polycare-pdf-root .p-sigs {
+  display: flex;
+  gap: 40px;
+  padding-top: 44px;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-sig-cell { flex: 1; }
+#polycare-pdf-root .p-sig-line {
+  height: 1px;
+  background: var(--p-navy);
+  margin-bottom: 5px;
+}
+#polycare-pdf-root .p-sig-name {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: var(--p-navy);
+}
+#polycare-pdf-root .p-sig-title {
+  font-size: 7.5px;
+  color: var(--p-muted);
+  margin-top: 2px;
+}
+#polycare-pdf-root .p-disclaimer {
+  font-size: 6.5px;
+  color: var(--p-muted);
+  background: var(--p-bg-alt);
+  padding: 6px var(--p-px);
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-footer {
+  background: var(--p-navy);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px var(--p-px);
+  font-size: 7px;
+  color: #7ab8b0;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+#polycare-pdf-root .p-footer strong { color: var(--p-teal-lt); }
+#polycare-pdf-root .p-footer .p-pgnum { color: #a0c4c0; }
+</style>
+
+<div id="polycare-pdf-root" style="display:none;position:fixed;top:0;left:0;z-index:-9999;width:794px;background:#fff;">
+  <div class="p-page" id="pdf-page-1">
+    <div class="p-hdr">
+      <div class="p-hdr-left">
+        <div class="p-brand">POLY<span>CARE</span></div>
+        <div class="p-brand-sub">AI-Based PCOS Detection System</div>
+      </div>
+      <div class="p-hdr-right">
+        <div><strong>Report ID:</strong> <span id="p1-report-id">—</span></div>
+        <div><strong>Generated:</strong> <span id="p1-gen-date">—</span></div>
+        <div><strong>Report Type:</strong> PCOS Clinical Summary</div>
+      </div>
+    </div>
+
+    <div class="p-body">
+
+      <div class="p-page-title">
+        PCOS Clinical Assessment Report
+        <span class="p-confidential">CONFIDENTIAL</span>
+      </div>
+
+      <div class="p-meta">
+        <div class="p-meta-cell">
+          <div class="p-meta-lbl">Patient Name</div>
+          <div class="p-meta-val" id="p1-patient-name">—</div>
+        </div>
+        <div class="p-meta-cell">
+          <div class="p-meta-lbl">Referred By</div>
+          <div class="p-meta-val" id="p1-doctor-name">—</div>
+        </div>
+        <div class="p-meta-cell">
+          <div class="p-meta-lbl">Report Date</div>
+          <div class="p-meta-val" id="p1-report-date">—</div>
+        </div>
+        <div class="p-meta-cell">
+          <div class="p-meta-lbl">Report ID</div>
+          <div class="p-meta-val" id="p1-report-id-meta">—</div>
+        </div>
+      </div>
+
+      <div class="p-verdict pcos-pos" id="p1-verdict-banner">
+        <div class="p-verdict-icon" id="p1-verdict-icon">⚠</div>
+        <div class="p-verdict-content">
+          <div class="p-verdict-label" id="p1-verdict-label">PCOS POSITIVE — Indicators Detected</div>
+          <div class="p-verdict-sub" id="p1-verdict-sub">
+            AI screening result based on clinical data analysis. Must be confirmed by a qualified clinician.
+          </div>
+        </div>
+        <div class="p-verdict-meta">
+          <div class="p-vstat">Confidence Score <strong id="p1-conf">—</strong></div>
+          <div class="p-vstat">Risk Level <strong id="p1-risk">—</strong></div>
+          <div class="p-vstat">Analysis Mode <strong id="p1-modality">—</strong></div>
+        </div>
+      </div>
+
+      <div class="p-stack" style="flex:1;min-height:0;">
+
+        <div class="p-col" style="flex:0.85;">
+          <div class="p-sec">Basic Clinical Data</div>
+          <div class="p-col-body">
+            <table class="p-kv p-kv-wide" id="p1-clinical-table">
+            </table>
+          </div>
+        </div>
+
+        <div class="p-col" style="flex:1.15;">
+          <div class="p-sec">Laboratory Values</div>
+          <div class="p-col-body">
+            <table class="p-lab">
+              <thead>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Value</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="p1-lab-tbody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="p-footer">
+      <strong>POLYCARE</strong> &nbsp;|&nbsp; AI-Based PCOS Detection &nbsp;|&nbsp; For Screening Purposes Only
+      <span class="p-pgnum">Page 1 of 2</span>
+    </div>
+
+  </div>
+
+  <div class="p-page" id="pdf-page-2">
+
+    <div class="p-hdr">
+      <div class="p-hdr-left">
+        <div class="p-brand">POLY<span>CARE</span></div>
+        <div class="p-brand-sub">AI-Based PCOS Detection System</div>
+      </div>
+      <div class="p-hdr-right">
+        <div><strong>Report ID:</strong> <span id="p2-report-id">—</span></div>
+        <div><strong>Patient:</strong> <span id="p2-patient-name">—</span></div>
+        <div><strong>Report Type:</strong> Ultrasound image Analysis </div>
+      </div>
+    </div>
+
+    <div class="p-body">
+      <div class="p-page-title">
+        Supporting Clinical Output
+        <span class="p-confidential">CONFIDENTIAL</span>
+      </div>
+
+      <div class="p-sec">USG / Transvaginal</div>
+
+      <div class="p-cols" style="flex:3;min-height:0;">
+
+        <div class="p-col" style="flex:1.3;">
+          <div class="p-usg-wrap" id="p2-usg-wrap">
+            <img id="p2-usg-img" src="" alt="Ultrasound" style="max-width:100%;max-height:90%;object-fit:contain;border-radius:4px;">
+            <div class="p-usg-caption" id="p2-usg-caption">Uploaded Ultrasound Image</div>
+          </div>
+          <div class="p-no-image" id="p2-no-image" style="display:none;">
+            No ultrasound image was provided.<br>Structured clinical data analysis only.
+          </div>
+        </div>
+
+        <div class="p-col" style="flex:1;">
+          <div class="p-sec">Ultrasound Data</div>
+          <div class="p-col-body">
+            <table class="p-kv" id="p2-usg-table">
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-sec">Reported Symptoms</div>
+      <div class="p-box">
+        <div class="p-chips" id="p2-symptoms">
+        </div>
+      </div>
+
+      <div class="p-sec">Clinical Recommendation</div>
+      <div class="p-rec" id="p2-recommendation">—</div>
+
+
+      <div class="p-sigs">
+        <div class="p-sig-cell">
+          <div class="p-sig-line"></div>
+          <div class="p-sig-name" id="p2-sig-doctor">Dr. —</div>
+          <div class="p-sig-title">Referring Physician</div>
+        </div>
+        <div class="p-sig-cell">
+          <div class="p-sig-line"></div>
+          <div class="p-sig-name">POLYCARE AI Analysis Engine</div>
+          <div class="p-sig-title">Automated Report Generation</div>
+        </div>
+        <div class="p-sig-cell">
+          <div class="p-sig-line"></div>
+          <div class="p-sig-name" style="color:#64748b;font-weight:400;font-size:8px;">Date: <span id="p2-sig-date">—</span></div>
+          <div class="p-sig-title">Verification Timestamp</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="p-footer">
+      <strong>POLYCARE</strong> &nbsp;|&nbsp; AI-Based PCOS Detection &nbsp;|&nbsp; For Screening Purposes Only
+      <span class="p-pgnum">Page 2 of 2</span>
+    </div>
+
+  </div>
+
+
+
+</div>
+</body>
+</html>
